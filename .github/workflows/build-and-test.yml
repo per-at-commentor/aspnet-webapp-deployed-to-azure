@@ -1,0 +1,40 @@
+name: Build and Test
+
+env:
+  DOTNET_VERSION: 8.0.x
+  SOLUTION_FOLDER: src/WebApplication1
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Setup Nuget Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION_FOLDER }}
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore ${{ env.SOLUTION_FOLDER }}
+
+      - name: Test
+        run: dotnet test --no-build --verbosity normal ${{ env.SOLUTION_FOLDER }}

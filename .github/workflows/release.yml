@@ -1,0 +1,112 @@
+name: Create and deploy a new release to all environments
+
+env:
+  DOTNET_VERSION: 8.0.x
+  AZURE_WEBAPP_NAME: WebApplication1
+  SOLUTION_FOLDER: src/WebApplication1
+  WEBAPP_FOLDER: src/WebApplication1/WebApplication1
+  ARTIFACT_FOLDER: output/artifacts
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Setup Nuget Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION_FOLDER }}
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore ${{ env.SOLUTION_FOLDER }}
+
+      - name: Test
+        run: dotnet test --no-build --verbosity normal ${{ env.SOLUTION_FOLDER }}
+
+      - name: Publish
+        run: dotnet publish -c Release -o '${{ env.ARTIFACT_FOLDER }}/webapp' ${{ env.WEBAPP_FOLDER }}
+
+      - name: Upload webapp artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: webapp
+          path: "${{ env.ARTIFACT_FOLDER }}/webapp"
+
+  deploy-development:
+      runs-on: ubuntu-latest
+      needs: build
+      environment:
+        name: "Development"
+        url: ${{ steps.deploy-webapp.outputs.webapp-url }}
+      steps:
+        - name: Download webapp artifact
+          uses: actions/download-artifact@v3
+          with:
+            name: webapp
+            path: webapp
+
+        - name: Deploy
+          id: deploy-webapp
+          uses: azure/webapps-deploy@v2
+          with:
+            app-name: ${{ env.AZURE_WEBAPP_NAME }}
+            publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+            package: webapp
+
+deploy-staging:
+      runs-on: ubuntu-latest
+      needs: build
+      environment:
+        name: "Stageing"
+        url: ${{ steps.deploy-webapp.outputs.webapp-url }}
+      steps:
+        - name: Download webapp artifact
+          uses: actions/download-artifact@v3
+          with:
+            name: webapp
+            path: webapp
+
+        - name: Deploy
+          id: deploy-webapp
+          uses: azure/webapps-deploy@v2
+          with:
+            app-name: ${{ env.AZURE_WEBAPP_NAME }}
+            publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+            package: webapp
+
+    deploy-production:
+      runs-on: ubuntu-latest
+      needs: build
+      environment:
+        name: "Production"
+        url: ${{ steps.deploy-webapp.outputs.webapp-url }}
+      steps:
+        - name: Download webapp artifact
+          uses: actions/download-artifact@v3
+          with:
+            name: webapp
+            path: webapp
+
+        - name: Deploy
+          id: deploy-webapp
+          uses: azure/webapps-deploy@v2
+          with:
+            app-name: ${{ env.AZURE_WEBAPP_NAME }}
+            publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+            package: webapp

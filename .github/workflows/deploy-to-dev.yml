@@ -1,0 +1,66 @@
+name: Deploy snapshot to Development
+
+env:
+  DOTNET_VERSION: 8.0.x
+  AZURE_WEBAPP_NAME: WebApplication1
+  WEBAPP_FOLDER: src/WebApplication1/WebApplication1
+  ARTIFACT_FOLDER: output/artifacts
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Setup Nuget Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Publish
+        run: dotnet publish -c Release -o '${{ env.ARTIFACT_FOLDER }}/webapp' ${{ env.WEBAPP_FOLDER }}
+
+      - name: Upload webapp artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: webapp
+          path: "${{ env.ARTIFACT_FOLDER }}/webapp"
+
+    deploy:
+      runs-on: ubuntu-latest
+      permissions:
+        contents: none
+      needs: build
+      environment:
+        name: "Development"
+        url: ${{ steps.deploy-webapp.outputs.webapp-url }}
+
+      steps:
+        - name: Download webapp artifact
+          uses: actions/download-artifact@v3
+          with:
+            name: webapp
+            path: webapp
+
+        - name: Deploy
+          id: deploy-webapp
+          uses: azure/webapps-deploy@v2
+          with:
+            app-name: ${{ env.AZURE_WEBAPP_NAME }}
+            publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+            package: webapp
