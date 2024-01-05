@@ -7,8 +7,7 @@ env:
   WEBAPP_FOLDER: src/WebApplication1/WebApplication1
   ARTIFACT_FOLDER: output/artifacts
 
-on:
-  workflow_dispatch
+on: workflow_dispatch
 
 jobs:
   build:
