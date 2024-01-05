@@ -34,7 +34,7 @@ jobs:
         run: dotnet restore ${{ env.SOLUTION_FOLDER }}
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore ${{ env.SOLUTION_FOLDER }}
+        run: dotnet build --no-restore ${{ env.SOLUTION_FOLDER }}
 
       - name: Test
         run: dotnet test --no-build --verbosity normal ${{ env.SOLUTION_FOLDER }}
