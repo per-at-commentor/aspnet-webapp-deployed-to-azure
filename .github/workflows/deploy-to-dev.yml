@@ -11,6 +11,8 @@ on:
     branches:
       - main
   workflow_dispatch:
+    branches:
+      - "**"
 
 jobs:
   build:
@@ -41,26 +43,26 @@ jobs:
           name: webapp
           path: "${{ env.ARTIFACT_FOLDER }}/webapp"
 
-    deploy:
-      runs-on: ubuntu-latest
-      permissions:
-        contents: none
-      needs: build
-      environment:
-        name: "Development"
-        url: ${{ steps.deploy-webapp.outputs.webapp-url }}
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: none
+    needs: build
+    environment:
+      name: "Development"
+      url: ${{ steps.deploy-webapp.outputs.webapp-url }}
 
-      steps:
-        - name: Download webapp artifact
-          uses: actions/download-artifact@v3
-          with:
-            name: webapp
-            path: webapp
+    steps:
+      - name: Download webapp artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: webapp
+          path: webapp
 
-        - name: Deploy
-          id: deploy-webapp
-          uses: azure/webapps-deploy@v2
-          with:
-            app-name: ${{ env.AZURE_WEBAPP_NAME }}
-            publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-            package: webapp
+      - name: Deploy
+        id: deploy-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: webapp
