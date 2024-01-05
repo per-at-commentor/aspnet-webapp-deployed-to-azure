@@ -10,10 +10,11 @@ env:
 on:
   push:
     branches:
-      - release/*
+      - 'release/*'
   workflow_dispatch:
 
 jobs:
+  build:
   build:
     runs-on: ubuntu-latest
     steps:
