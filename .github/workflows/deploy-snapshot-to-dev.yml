@@ -39,7 +39,7 @@ jobs:
           name: webapp
           path: ${{env.DOTNET_ROOT}}/webapp
 
-  deploy-development:
+  deploy-to-development:
     runs-on: ubuntu-latest
     needs: build
     environment:
