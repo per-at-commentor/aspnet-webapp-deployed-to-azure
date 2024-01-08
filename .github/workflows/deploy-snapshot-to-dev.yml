@@ -49,7 +49,7 @@ jobs:
           echo "assembly_version=$ASSEMBLY_VERSION" >> $GITHUB_OUTPUT
 
       - name: Publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:AssemblyVersion=$ASSEMBLY_VERSION -p:AssemblyFileVersion=$ASSEMBLY_VERSION -p:Version=$PACKAGE_VERSION ${{ env.WEBAPP_FOLDER }}
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:AssemblyVersion=$ASSEMBLY_VERSION -p:Version=$PACKAGE_VERSION ${{ env.WEBAPP_FOLDER }}
         env:
           ASSEMBLY_VERSION: ${{ steps.version-numbers.outputs.assembly_version }}
           PACKAGE_VERSION: ${{ steps.version-numbers.outputs.package_version }}
