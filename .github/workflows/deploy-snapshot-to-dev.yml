@@ -1,10 +1,8 @@
 name: Deploy snapshot to Development
 
 env:
-  DOTNET_VERSION: 8.0.x
-  AZURE_WEBAPP_NAME: WebApplication1
+  AZURE_WEBAPP_NAME: dev-webapp-pfm
   WEBAPP_FOLDER: src/WebApplication1/WebApplication1
-  ARTIFACT_FOLDER: output/artifacts
 
 on:
   push:
@@ -22,7 +20,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-version: 8.0.x
 
       - name: Setup Nuget Cache
         uses: actions/cache@v3
@@ -33,13 +31,13 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Publish
-        run: dotnet publish -c Release -o '${{ env.ARTIFACT_FOLDER }}/webapp' ${{ env.WEBAPP_FOLDER }}
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp ${{ env.WEBAPP_FOLDER }}
 
       - name: Upload webapp artifact
         uses: actions/upload-artifact@v3
         with:
           name: webapp
-          path: "${{ env.ARTIFACT_FOLDER }}/webapp"
+          path: ${{env.DOTNET_ROOT}}/webapp
 
   deploy-development:
     runs-on: ubuntu-latest
