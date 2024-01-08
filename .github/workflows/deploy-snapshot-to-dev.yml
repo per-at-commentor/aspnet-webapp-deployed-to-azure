@@ -34,13 +34,13 @@ jobs:
       - name: Make version numbers
         id: version-numbers
         run: |
-          echo "assembly_version=0.0.1.${{github.run_id}}" >> $GITHUB_OUTPUT
+          echo "assembly_version=0.0.*" >> $GITHUB_OUTPUT
           echo "assembly_file_version=0.0.2.${{github.run_id}}" >> $GITHUB_OUTPUT
           echo "package_version=0.0.3-build${{github.run_id}}" >> $GITHUB_OUTPUT
           echo "release_version=$(date --utc +'0.0.1-snapshot_%Y-%m-%d_%H:%M_UTC')" >> $GITHUB_OUTPUT
 
       - name: Publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:AssemblyVersion=$ASSEMBLY_VERSION -p:AssemblyFileVersion=$ASSEMBLY_FILE_VERSION -p:Version=$PACKAGE_VERSION ${{ env.WEBAPP_FOLDER }}
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:AssemblyVersion=$ASSEMBLY_VERSION -p:Version=$PACKAGE_VERSION ${{ env.WEBAPP_FOLDER }}
         env:
           ASSEMBLY_VERSION: ${{ steps.version-numbers.outputs.assembly_version }}
           ASSEMBLY_FILE_VERSION: ${{ steps.version-numbers.outputs.assembly_file_version }}

@@ -40,7 +40,7 @@
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2023 - WebApplication1 -
-            AssemblyVersion: @System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version
+            AssemblyVersion: @(System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version)
             FileVersion: @(System.Reflection.Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version)
             Version: @(System.Reflection.Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion)
                 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
