@@ -4,6 +4,11 @@ namespace TestProject1;
 public class UnitTest1
 {
     [TestMethod]
+    public void TestMethod4()
+    {
+    }
+    
+    [TestMethod]
     public void TestMethod0()
     {
     }
