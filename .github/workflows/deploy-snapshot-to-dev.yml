@@ -33,13 +33,12 @@ jobs:
       - name: Make version numbers
         id: version-numbers
         run: |
-          $
-          echo "::set-output name=datetime::$(date --utc +'%Y-%m-%d_%H:%M_UTC')"
+          echo "::set-output name=version-suffix::snapshot_$(date --utc +'%Y-%m-%d_%H:%M_UTC')"
 
       - name: Publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:VersionSuffix=Snapshot-$DATE_TIME ${{ env.WEBAPP_FOLDER }}
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:VersionSuffix=$VERSION_SUFFIX ${{ env.WEBAPP_FOLDER }}
         env:
-          DATE_TIME: ${{ steps.datetime.outputs.datetime }}
+          VERSION_SUFFIX: ${{ steps.version-numbers.outputs.version-suffix }}
 
       - name: Upload webapp artifact
         uses: actions/upload-artifact@v3
