@@ -33,8 +33,8 @@ jobs:
       - name: Make version numbers
         id: version-numbers
         run: |
-          echo "::set-output name=version-number::0.0.1"
-          echo "::set-output name=version-text::0.0.1-snapshot $(date --utc +'%Y-%m-%d %H:%M UTC')"
+          echo "version-number=0.0.1" >> $GITHUB_OUTPUT
+          echo "version-text=0.0.1-snapshot $(date --utc +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_OUTPUT
 
       - name: Publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:AssemblyVersion:$VERSION_NUMBER -p:Version=\"$VERSION_TEXT\" ${{ env.WEBAPP_FOLDER }}
