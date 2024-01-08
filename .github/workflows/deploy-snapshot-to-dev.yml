@@ -30,14 +30,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Get current date and time
-        id: datetime
-        run: echo "::set-output name=datetime::$(date --utc +'%Y-%m-%d %H:%M UTC')"
-
       - name: Publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:VersionSuffix="Snapshot $DATE_TIME" ${{ env.WEBAPP_FOLDER }}
-        env:
-          DATE_TIME: ${{ steps.datetime.outputs.datetime }}
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:VersionSuffix=snapshot${{github.run_number}} ${{ env.WEBAPP_FOLDER }}
 
       - name: Upload webapp artifact
         uses: actions/upload-artifact@v3
