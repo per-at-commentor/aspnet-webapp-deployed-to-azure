@@ -1,11 +1,13 @@
-name: Release pipeline
+name: Snapshot to Development
 
 env:
   AZURE_WEBAPP_NAME: dev-webapp-pfm
-  SOLUTION_FOLDER: src/WebApplication1
   WEBAPP_FOLDER: src/WebApplication1/WebApplication1
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -27,15 +29,6 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
-
-      - name: Restore
-        run: dotnet restore ${{ env.SOLUTION_FOLDER }}
-
-      - name: Build
-        run: dotnet build --configuration Release --no-restore ${{ env.SOLUTION_FOLDER }}
-
-      - name: Test
-        run: dotnet test --no-build --verbosity normal ${{ env.SOLUTION_FOLDER }}
 
       - name: Publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:VersionPrefix=$(cat version.txt) -p:VersionSuffix=snapshot${{github.run_number}} ${{ env.WEBAPP_FOLDER }}
@@ -66,45 +59,3 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: webapp
-
-  deploy-to-staging:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: "Stageing"
-      url: ${{ steps.deploy-webapp.outputs.webapp-url }}
-    steps:
-      - name: Download webapp artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: webapp
-          path: webapp
-
-      - name: Deploy
-        id: deploy-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: webapp
-
-    deploy-to-production:
-      runs-on: ubuntu-latest
-      needs: build
-      environment:
-        name: "Production"
-        url: ${{ steps.deploy-webapp.outputs.webapp-url }}
-      steps:
-        - name: Download webapp artifact
-          uses: actions/download-artifact@v3
-          with:
-            name: webapp
-            path: webapp
-
-        - name: Deploy
-          id: deploy-webapp
-          uses: azure/webapps-deploy@v2
-          with:
-            app-name: ${{ env.AZURE_WEBAPP_NAME }}
-            publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-            package: webapp
