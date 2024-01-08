@@ -6,7 +6,7 @@ public class UnitTest1
     [TestMethod]
     public void TestMethod0()
     {
-        
+        throw new Exception("TEST");
     }
     
     [TestMethod]
