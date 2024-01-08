@@ -41,15 +41,12 @@ jobs:
           name: webapp
           path: "${{ env.ARTIFACT_FOLDER }}/webapp"
 
-  deploy:
+  deploy-development:
     runs-on: ubuntu-latest
-    permissions:
-      contents: none
     needs: build
     environment:
       name: "Development"
       url: ${{ steps.deploy-webapp.outputs.webapp-url }}
-
     steps:
       - name: Download webapp artifact
         uses: actions/download-artifact@v3
