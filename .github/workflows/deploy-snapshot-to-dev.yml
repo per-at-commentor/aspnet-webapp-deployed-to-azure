@@ -37,7 +37,7 @@ jobs:
           echo "version-text=0.0.1-snapshot $(date --utc +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_OUTPUT
 
       - name: Publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:AssemblyVersion=$VERSION_NUMBER -p:Version=\"$VERSION_TEXT\" ${{ env.WEBAPP_FOLDER }}
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:AssemblyVersion=$VERSION_NUMBER -p:Version='$VERSION_TEXT' ${{ env.WEBAPP_FOLDER }}
         env:
           VERSION_NUMBER: ${{ steps.version-numbers.outputs.version-number }}
           VERSION_TEXT: ${{ steps.version-numbers.outputs.version-text }}
