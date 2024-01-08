@@ -7,4 +7,9 @@ public class UnitTest1
     public void TestMethod1()
     {
     }
+
+    [TestMethod]
+    public void TestMethod2()
+    {
+    }
 }
