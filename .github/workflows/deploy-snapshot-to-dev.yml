@@ -2,7 +2,7 @@ name: Deploy snapshot to Development
 
 env:
   DOTNET_VERSION: 8.0.x
-  AZURE_WEBAPP_NAME: WebApplication1
+  AZURE_WEBAPP_NAME: dev-webapp-pfm
   WEBAPP_FOLDER: src/WebApplication1/WebApplication1
   ARTIFACT_FOLDER: output/artifacts
 

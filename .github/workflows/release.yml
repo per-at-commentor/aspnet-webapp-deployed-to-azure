@@ -2,7 +2,7 @@ name: Create and deploy a new release to all environments
 
 env:
   DOTNET_VERSION: 8.0.x
-  AZURE_WEBAPP_NAME: WebApplication1
+  AZURE_WEBAPP_NAME: dev-webapp-pfm
   SOLUTION_FOLDER: src/WebApplication1
   WEBAPP_FOLDER: src/WebApplication1/WebApplication1
   ARTIFACT_FOLDER: output/artifacts
