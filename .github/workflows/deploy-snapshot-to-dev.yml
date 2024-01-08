@@ -40,7 +40,7 @@ jobs:
           SECONDS_SINCE_2000=$(($(date +%s) - $(date --date=000101 +%s)))
           DAYS_SINCE_2000=$(($SECONDS_SINCE_2000 / (60*60*24)))
           SECONDS_SINCE_MIDNIGHT_DIVIDED_BY_2=$(( ($SECONDS_SINCE_2000 % (60*60*24)) / 2 ))
-          echo "assembly_version=$MAJOR.$MINOR.$BUILD_NUMBER.$SECONDS_SINCE_MIDNIGHT_DIVIDED_BY_2" >> $GITHUB_OUTPUT
+          echo "assembly_version=$MAJOR.$MINOR.$DAYS_SINCE_2000.$SECONDS_SINCE_MIDNIGHT_DIVIDED_BY_2" >> $GITHUB_OUTPUT
           echo "package_version=$MAJOR.$MINOR.$PATCH-build${{github.run_id}}" >> $GITHUB_OUTPUT
 
       - name: Publish
