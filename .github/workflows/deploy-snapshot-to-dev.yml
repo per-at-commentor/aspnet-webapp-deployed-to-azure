@@ -31,33 +31,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Make version numbers
-        id: version-numbers
-        run: |
-          MAJOR=0
-          MINOR=0
-          PATCH=0
-          VERSION_PREFIX="$MAJOR.$MINOR.$PATCH"
-          echo "VERSION_PREFIX=$VERSION_PREFIX"
-          echo "VERSION_PREFIX=$VERSION_PREFIX" >> $GITHUB_OUTPUT
-
-          VERSION_SUFFIX="-snapshot${{github.run_number}}"
-          echo "VERSION_SUFFIX=$VERSION_SUFFIX"
-          echo "VERSION_SUFFIX=$VERSION_SUFFIX" >> $GITHUB_OUTPUT
-
-          SECONDS_SINCE_2000=$(($(date +%s) - $(date --date=000101 +%s)))
-          DAYS_SINCE_2000=$(($SECONDS_SINCE_2000 / (60*60*24)))
-          SECONDS_SINCE_MIDNIGHT_DIVIDED_BY_2=$(( ($SECONDS_SINCE_2000 % (60*60*24)) / 2 ))
-          ASSEMBLY_VERSION="$MAJOR.$MINOR.$DAYS_SINCE_2000.$SECONDS_SINCE_MIDNIGHT_DIVIDED_BY_2"
-          echo "ASSEMBLY_VERSION=$ASSEMBLY_VERSION"
-          echo "ASSEMBLY_VERSION=$ASSEMBLY_VERSION" >> $GITHUB_OUTPUT
-
       - name: Publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:VersionSuffix=$VERSION_SUFFIX ${{ env.WEBAPP_FOLDER }}
-        env:
-          ASSEMBLY_VERSION: ${{ steps.version-numbers.outputs.ASSEMBLY_VERSION }}
-          VERSION_PREFIX: ${{ steps.version-numbers.outputs.VERSION_PREFIX }}
-          VERSION_SUFFIX: ${{ steps.version-numbers.outputs.VERSION_SUFFIX }}
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:VersionSuffix=snapshot${{github.run_number}} ${{ env.WEBAPP_FOLDER }}
 
       - name: Upload webapp artifact
         uses: actions/upload-artifact@v3
