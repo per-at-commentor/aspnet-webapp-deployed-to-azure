@@ -1,4 +1,4 @@
-name: Create and deploy a new release to all environments
+name: Release pipeline
 
 env:
   AZURE_WEBAPP_NAME: dev-webapp-pfm
@@ -6,13 +6,10 @@ env:
   WEBAPP_FOLDER: src/WebApplication1/WebApplication1
 
 on:
-  push:
-    branches:
-      - release/*
   workflow_dispatch:
 
 jobs:
-  build:
+  build-test-and-publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -51,7 +48,7 @@ jobs:
 
   deploy-to-development:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-test-and-publish
     environment:
       name: "Development"
       url: ${{ steps.deploy-webapp.outputs.webapp-url }}
@@ -72,7 +69,7 @@ jobs:
 
   deploy-to-staging:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-test-and-publish
     environment:
       name: "Stageing"
       url: ${{ steps.deploy-webapp.outputs.webapp-url }}
@@ -93,7 +90,7 @@ jobs:
 
     deploy-to-production:
       runs-on: ubuntu-latest
-      needs: build
+      needs: build-test-and-publish
       environment:
         name: "Production"
         url: ${{ steps.deploy-webapp.outputs.webapp-url }}
