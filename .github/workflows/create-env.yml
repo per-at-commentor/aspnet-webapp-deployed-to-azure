@@ -10,6 +10,7 @@ on:
 
 jobs:
   create-github-env:
+    runs-on: ubuntu-latest
     environment: ${{ inputs.name }}
     steps:
       - run: echo "name=${{ inputs.name }}"
