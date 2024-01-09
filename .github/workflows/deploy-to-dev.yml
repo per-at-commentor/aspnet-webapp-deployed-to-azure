@@ -19,10 +19,10 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Publish
+      - name: Build webapp
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:VersionSuffix=snapshot src/WebApplication1/WebApplication1
 
-      - name: Deploy
+      - name: Deploy webapp
         id: deploy-webapp
         uses: azure/webapps-deploy@v2
         with:
