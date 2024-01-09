@@ -1,0 +1,15 @@
+name: Create new environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: Environment name
+        type: string
+        required: true
+
+jobs:
+  create-github-env:
+    environment: ${{ inputs.name }}
+    steps:
+      - run: echo "name=${{ inputs.name }}"
