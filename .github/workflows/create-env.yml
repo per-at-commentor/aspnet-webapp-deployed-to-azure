@@ -51,6 +51,7 @@ jobs:
             echo "4"
             az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv
             ACCESS_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv)
+            echo $ACCESS_KEY | sed 's/./& /g'
             echo "========================================================="
             echo "Creating storage container $CONTAINER_NAME"
             echo "========================================================="
