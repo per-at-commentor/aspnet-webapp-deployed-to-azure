@@ -47,7 +47,7 @@ jobs:
             echo "========================================================="
             echo "Creating storage container $CONTAINER_NAME"
             echo "========================================================="
-            az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME
+            az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME --auth-mode login
             echo "========================================================="
             echo "Output variables"
             echo "========================================================="
