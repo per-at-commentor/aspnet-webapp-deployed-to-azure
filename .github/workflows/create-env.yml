@@ -28,14 +28,24 @@ jobs:
         with:
           azcliversion: 2.56.0
           inlineScript: |
-            az account show
-            az storage -h
             RESOURCE_GROUP_NAME=webapp-${{ inputs.ENV_NAME }}-rg
             STORAGE_ACCOUNT_NAME=tfstate$RANDOM
             CONTAINER_NAME=tfstate
+            echo "========================================================="
+            echo "Creating resource group $RESOURCE_GROUP_NAME"
+            echo "========================================================="
             az group create --name $RESOURCE_GROUP_NAME --location westeurope
+            echo "========================================================="
+            echo "Creating storrage account $STORAGE_ACCOUNT_NAME"
+            echo "========================================================="
             az storage account create --resource-group $RESOURCE_GROUP_NAME --name $STORAGE_ACCOUNT_NAME --sku Standard_LRS --encryption-services blob
+            echo "========================================================="
+            echo "Creating storage container $CONTAINER_NAME"
+            echo "========================================================="
             az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME
+            echo "========================================================="
+            echoe "Getting storage access key"
+            echo "========================================================="
             ACCESS_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv)
             echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_OUTPUT
             echo "ACCESS_KEY=$ACCESS_KEY" >> $GITHUB_OUTPUT
