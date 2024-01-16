@@ -3,7 +3,7 @@ name: Create new environment
 on:
   workflow_dispatch:
     inputs:
-      name:
+      ENV_NAME:
         description: Environment name
         type: string
         required: true
@@ -14,6 +14,8 @@ jobs:
     environment: root
     outputs:
       RESOURCE_GROUP_NAME: ${{ steps.az-script.outputs.RESOURCE_GROUP_NAME }}
+      TERRAFORM_STORAGE_ACCOUNT_NAME: ${{ steps.az-script.outputs.STORAGE_ACCOUNT_NAME }}
+      TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY: ${{ steps.az-script.outputs.ACCESS_KEY }}
     steps:
       - name: Azure Login
         uses: azure/login@v1
@@ -24,22 +26,34 @@ jobs:
         id: az-script
         uses: azure/CLI@v1
         with:
-          azcliversion: 2.30.0
+          azcliversion: 2.56.0
           inlineScript: |
             az account show
             az storage -h
-            RESOURCE_GROUP_NAME=webapp-${{ inputs.name }}-rg
+            RESOURCE_GROUP_NAME=webapp-${{ inputs.ENV_NAME }}-rg
             STORAGE_ACCOUNT_NAME=tfstate$RANDOM
             CONTAINER_NAME=tfstate
+            az group create --name $RESOURCE_GROUP_NAME --location euwest
+            az storage account create --resource-group $RESOURCE_GROUP_NAME --name $STORAGE_ACCOUNT_NAME --sku Standard_LRS --encryption-services blob
+            az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME
+            ACCESS_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv)
             echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_OUTPUT
-  #            az group create --name $RESOURCE_GROUP_NAME --location euwest
-  #            az storage account create --resource-group $RESOURCE_GROUP_NAME --name $STORAGE_ACCOUNT_NAME --sku Standard_LRS --encryption-services blob
-  #            az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME
+            echo "ACCESS_KEY=$ACCESS_KEY" >> $GITHUB_OUTPUT
+            echo "STORAGE_ACCOUNT_NAME=$STORAGE_ACCOUNT_NAME" >> $GITHUB_OUTPUT
 
   github:
     runs-on: ubuntu-latest
     needs: azure
     # Specifying a non-existing environment will create it in GitHub
-    environment: ${{ inputs.name }}
+    environment: ${{ inputs.ENV_NAME }}
     steps:
-      - run: echo ${{ needs.azure.outputs.RESOURCE_GROUP_NAME }}
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ENV_NAME: ${{ inputs.ENV_NAME }}
+          RESOURCE_GROUP_NAME: ${{ needs.azure.outputs.RESOURCE_GROUP_NAME }}
+          TERRAFORM_STORAGE_ACCOUNT_NAME: ${{ needs.azure.outputs.TERRAFORM_STORAGE_ACCOUNT_NAME }}
+          TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY: ${{ needs.azure.outputs.TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY }}
+        run: |
+          gh secret set RESOURCE_GROUP_NAME -e "$ENV_NAME" --body "$RESOURCE_GROUP_NAME"
+          gh secret set TERRAFORM_STORAGE_ACCOUNT_NAME -e "$ENV_NAME" --body "$TERRAFORM_STORAGE_ACCOUNT_NAME"
+          gh secret set TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY -e "$ENV_NAME" --body "$TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY"
