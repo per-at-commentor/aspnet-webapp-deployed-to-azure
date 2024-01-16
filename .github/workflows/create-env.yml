@@ -40,7 +40,7 @@ jobs:
             echo "========================================================="
             az storage account create --resource-group $RESOURCE_GROUP_NAME --name $STORAGE_ACCOUNT_NAME --sku Standard_LRS --encryption-services blob
             echo "========================================================="
-            echoe "Getting storage access key"
+            echo "Getting storage access key"
             echo "========================================================="
             az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME
             ACCESS_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv)
