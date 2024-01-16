@@ -21,7 +21,7 @@ jobs:
           GH_DEBUG: api
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh secret set TEST -R per-at-commentor/aspnet-webapp-deployed-to-azure -e ${{ inputs.ENV_NAME }} --body "jsdlkfjdlf"
+          gh secret set TEST -R ${{github.repository}} -e ${{ inputs.ENV_NAME }} --body "jsdlkfjdlf"
 
   azure:
     runs-on: ubuntu-latest
