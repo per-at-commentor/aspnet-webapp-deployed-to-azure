@@ -61,7 +61,11 @@ jobs:
     # Specifying a non-existing environment will create it in GitHub
     environment: ${{ inputs.ENV_NAME }}
     steps:
-      - env:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure environment
+        env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENV_NAME: ${{ inputs.ENV_NAME }}
           RESOURCE_GROUP_NAME: ${{ needs.azure.outputs.RESOURCE_GROUP_NAME }}
