@@ -8,6 +8,8 @@ on:
         type: string
         required: true
 
+permissions: write-all
+
 jobs:
   github0:
     runs-on: ubuntu-latest
