@@ -40,16 +40,20 @@ jobs:
             echo "========================================================="
             az storage account create --resource-group $RESOURCE_GROUP_NAME --name $STORAGE_ACCOUNT_NAME --sku Standard_LRS --encryption-services blob
             echo "========================================================="
+            echoe "Getting storage access key"
+            echo "========================================================="
+            az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME
+            ACCESS_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv)
+            echo "========================================================="
             echo "Creating storage container $CONTAINER_NAME"
             echo "========================================================="
             az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME
             echo "========================================================="
-            echoe "Getting storage access key"
+            echo "Output variables"
             echo "========================================================="
-            ACCESS_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv)
             echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_OUTPUT
-            echo "ACCESS_KEY=$ACCESS_KEY" >> $GITHUB_OUTPUT
             echo "STORAGE_ACCOUNT_NAME=$STORAGE_ACCOUNT_NAME" >> $GITHUB_OUTPUT
+            echo "ACCESS_KEY=$ACCESS_KEY" >> $GITHUB_OUTPUT
 
   github:
     runs-on: ubuntu-latest
