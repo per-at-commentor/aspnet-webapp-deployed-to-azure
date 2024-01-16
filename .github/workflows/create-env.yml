@@ -42,7 +42,14 @@ jobs:
             echo "========================================================="
             echo "Getting storage access key"
             echo "========================================================="
+            echo "1"
             az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME
+            echo "2"
+            az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0]'
+            echo "3"
+            az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value'
+            echo "4"
+            az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv
             ACCESS_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv)
             echo "========================================================="
             echo "Creating storage container $CONTAINER_NAME"
