@@ -14,14 +14,15 @@ jobs:
   github0:
     runs-on: ubuntu-latest
     # Specifying a non-existing environment will create it in GitHub
-    environment: ${{ inputs.ENV_NAME }}
+    # environment: ${{ inputs.ENV_NAME }}
     steps:
       - name: Configure environment
         env:
           GH_DEBUG: api
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh secret set TEST -R ${{github.repository}} -e ${{ inputs.ENV_NAME }} --body "jsdlkfjdlf"
+          gh api --method PUT -H "Accept: application/vnd.github+json" repos/${{ github.repository }}/environments/${{ inputs.ENV_NAME }}
+          gh secret set TEST -R ${{ github.repository }} -e ${{ inputs.ENV_NAME }} --body "jsdlkfjdlf"
 
   azure:
     runs-on: ubuntu-latest
