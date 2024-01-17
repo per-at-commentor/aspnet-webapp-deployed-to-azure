@@ -19,74 +19,74 @@ jobs:
       - name: Configure environment
         env:
           GH_DEBUG: api
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.ENV_CREATION_PAT }}
         run: |
           gh api --method PUT -H "Accept: application/vnd.github+json" repos/${{ github.repository }}/environments/${{ inputs.ENV_NAME }}
           gh secret set TEST -R ${{ github.repository }} -e ${{ inputs.ENV_NAME }} --body "jsdlkfjdlf"
 
-  azure:
-    runs-on: ubuntu-latest
-    needs: github0
-    environment: root
-    outputs:
-      RESOURCE_GROUP_NAME: ${{ steps.az-script.outputs.RESOURCE_GROUP_NAME }}
-      TERRAFORM_STORAGE_ACCOUNT_NAME: ${{ steps.az-script.outputs.STORAGE_ACCOUNT_NAME }}
-      TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY: ${{ steps.az-script.outputs.ACCESS_KEY }}
-    steps:
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+  # azure:
+  #   runs-on: ubuntu-latest
+  #   needs: github0
+  #   environment: root
+  #   outputs:
+  #     RESOURCE_GROUP_NAME: ${{ steps.az-script.outputs.RESOURCE_GROUP_NAME }}
+  #     TERRAFORM_STORAGE_ACCOUNT_NAME: ${{ steps.az-script.outputs.STORAGE_ACCOUNT_NAME }}
+  #     TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY: ${{ steps.az-script.outputs.ACCESS_KEY }}
+  #   steps:
+  #     - name: Azure Login
+  #       uses: azure/login@v1
+  #       with:
+  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Azure CLI script
-        id: az-script
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.56.0
-          inlineScript: |
-            RESOURCE_GROUP_NAME=webapp-${{ inputs.ENV_NAME }}-rg
-            STORAGE_ACCOUNT_NAME=tfstate$RANDOM
-            CONTAINER_NAME=tfstate
-            echo "========================================================="
-            echo "Creating resource group $RESOURCE_GROUP_NAME"
-            echo "========================================================="
-            az group create --name $RESOURCE_GROUP_NAME --location westeurope
-            echo "========================================================="
-            echo "Creating storrage account $STORAGE_ACCOUNT_NAME"
-            echo "========================================================="
-            az storage account create --resource-group $RESOURCE_GROUP_NAME --name $STORAGE_ACCOUNT_NAME --sku Standard_LRS --encryption-services blob
-            echo "========================================================="
-            echo "Getting storage access key"
-            echo "========================================================="
-            ACCESS_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv)
-            echo "========================================================="
-            echo "Creating storage container $CONTAINER_NAME"
-            echo "========================================================="
-            az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME --auth-mode login
-            echo "========================================================="
-            echo "Output variables"
-            echo "========================================================="
-            echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_OUTPUT
-            echo "STORAGE_ACCOUNT_NAME=$STORAGE_ACCOUNT_NAME" >> $GITHUB_OUTPUT
-            echo "ACCESS_KEY=$ACCESS_KEY" >> $GITHUB_OUTPUT
+  #     - name: Azure CLI script
+  #       id: az-script
+  #       uses: azure/CLI@v1
+  #       with:
+  #         azcliversion: 2.56.0
+  #         inlineScript: |
+  #           RESOURCE_GROUP_NAME=webapp-${{ inputs.ENV_NAME }}-rg
+  #           STORAGE_ACCOUNT_NAME=tfstate$RANDOM
+  #           CONTAINER_NAME=tfstate
+  #           echo "========================================================="
+  #           echo "Creating resource group $RESOURCE_GROUP_NAME"
+  #           echo "========================================================="
+  #           az group create --name $RESOURCE_GROUP_NAME --location westeurope
+  #           echo "========================================================="
+  #           echo "Creating storrage account $STORAGE_ACCOUNT_NAME"
+  #           echo "========================================================="
+  #           az storage account create --resource-group $RESOURCE_GROUP_NAME --name $STORAGE_ACCOUNT_NAME --sku Standard_LRS --encryption-services blob
+  #           echo "========================================================="
+  #           echo "Getting storage access key"
+  #           echo "========================================================="
+  #           ACCESS_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv)
+  #           echo "========================================================="
+  #           echo "Creating storage container $CONTAINER_NAME"
+  #           echo "========================================================="
+  #           az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME --auth-mode login
+  #           echo "========================================================="
+  #           echo "Output variables"
+  #           echo "========================================================="
+  #           echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_OUTPUT
+  #           echo "STORAGE_ACCOUNT_NAME=$STORAGE_ACCOUNT_NAME" >> $GITHUB_OUTPUT
+  #           echo "ACCESS_KEY=$ACCESS_KEY" >> $GITHUB_OUTPUT
 
-  github:
-    runs-on: ubuntu-latest
-    needs: azure
-    # Specifying a non-existing environment will create it in GitHub
-    environment: ${{ inputs.ENV_NAME }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  # github:
+  #   runs-on: ubuntu-latest
+  #   needs: azure
+  #   # Specifying a non-existing environment will create it in GitHub
+  #   environment: ${{ inputs.ENV_NAME }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - name: Configure environment
-        env:
-          GH_DEBUG: api
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RESOURCE_GROUP_NAME: ${{ needs.azure.outputs.RESOURCE_GROUP_NAME }}
-          TERRAFORM_STORAGE_ACCOUNT_NAME: ${{ needs.azure.outputs.TERRAFORM_STORAGE_ACCOUNT_NAME }}
-          TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY: ${{ needs.azure.outputs.TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY }}
-        run: |
-          gh secret set RESOURCE_GROUP_NAME -e ${{ inputs.ENV_NAME }} --body "$RESOURCE_GROUP_NAME"
-          gh secret set TERRAFORM_STORAGE_ACCOUNT_NAME -e ${{ inputs.ENV_NAME }} --body "$TERRAFORM_STORAGE_ACCOUNT_NAME"
-          gh secret set TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY -e ${{ inputs.ENV_NAME }} --body "$TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY"
+  #     - name: Configure environment
+  #       env:
+  #         GH_DEBUG: api
+  #         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #         RESOURCE_GROUP_NAME: ${{ needs.azure.outputs.RESOURCE_GROUP_NAME }}
+  #         TERRAFORM_STORAGE_ACCOUNT_NAME: ${{ needs.azure.outputs.TERRAFORM_STORAGE_ACCOUNT_NAME }}
+  #         TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY: ${{ needs.azure.outputs.TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY }}
+  #       run: |
+  #         gh secret set RESOURCE_GROUP_NAME -e ${{ inputs.ENV_NAME }} --body "$RESOURCE_GROUP_NAME"
+  #         gh secret set TERRAFORM_STORAGE_ACCOUNT_NAME -e ${{ inputs.ENV_NAME }} --body "$TERRAFORM_STORAGE_ACCOUNT_NAME"
+  #         gh secret set TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY -e ${{ inputs.ENV_NAME }} --body "$TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY"
