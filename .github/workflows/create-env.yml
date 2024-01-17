@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     # Specifying a non-existing environment will create it in GitHub
     # environment: ${{ inputs.ENV_NAME }}
+    environment: root
     steps:
       - name: Configure environment
         env:
