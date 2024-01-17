@@ -62,9 +62,9 @@ jobs:
           TERRAFORM_STORAGE_ACCOUNT_NAME: ${{ steps.azure.outputs.TERRAFORM_STORAGE_ACCOUNT_NAME }}
         run: |
           gh api --method PUT repos/${{ github.repository }}/environments/${{ inputs.ENV_NAME }}
-          gh secret set RESOURCE_GROUP_NAME -e ${{ inputs.ENV_NAME }} --body "$RESOURCE_GROUP_NAME"
-          gh secret set TERRAFORM_STORAGE_ACCOUNT_NAME -e ${{ inputs.ENV_NAME }} --body "$TERRAFORM_STORAGE_ACCOUNT_NAME"
           gh secret set TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY -e ${{ inputs.ENV_NAME }} --body "$TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY"
+          gh variable set RESOURCE_GROUP_NAME -e ${{ inputs.ENV_NAME }} --body "$RESOURCE_GROUP_NAME"
+          gh variable set TERRAFORM_STORAGE_ACCOUNT_NAME -e ${{ inputs.ENV_NAME }} --body "$TERRAFORM_STORAGE_ACCOUNT_NAME"
 
   # azure:
   #   runs-on: ubuntu-latest
