@@ -8,22 +8,63 @@ on:
         type: string
         required: true
 
-permissions: write-all
-
 jobs:
-  github0:
+  create-env:
     runs-on: ubuntu-latest
     # Specifying a non-existing environment will create it in GitHub
     # environment: ${{ inputs.ENV_NAME }}
     environment: root
     steps:
-      - name: Configure environment
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Create Azure Resources
+        id: azure
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.56.0
+          inlineScript: |
+            RESOURCE_GROUP_NAME=webapp-${{ inputs.ENV_NAME }}-rg
+            STORAGE_ACCOUNT_NAME=tfstate$RANDOM
+            CONTAINER_NAME=tfstate
+            echo "========================================================="
+            echo "Creating resource group $RESOURCE_GROUP_NAME"
+            echo "========================================================="
+            az group create --name $RESOURCE_GROUP_NAME --location westeurope
+            echo "========================================================="
+            echo "Creating storrage account $STORAGE_ACCOUNT_NAME"
+            echo "========================================================="
+            az storage account create --resource-group $RESOURCE_GROUP_NAME --name $STORAGE_ACCOUNT_NAME --sku Standard_LRS --encryption-services blob
+            echo "========================================================="
+            echo "Getting storage access key"
+            echo "========================================================="
+            ACCESS_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv)
+            echo "========================================================="
+            echo "Creating storage container $CONTAINER_NAME"
+            echo "========================================================="
+            az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT_NAME --auth-mode login
+            echo "========================================================="
+            echo "Output variables"
+            echo "========================================================="
+            echo "::add-mask::$ACCESS_KEY"
+            echo "ACCESS_KEY=$ACCESS_KEY" >> $GITHUB_OUTPUT
+            echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_OUTPUT
+            echo "STORAGE_ACCOUNT_NAME=$STORAGE_ACCOUNT_NAME" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Environment
         env:
           GH_DEBUG: api
-          GH_TOKEN: ${{ secrets.ENV_CREATION_PAT }}
+          GH_TOKEN: ${{ secrets.ADM_ENV_SECRETS_TOKEN }}
+          TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY: ${{ steps.azure.outputs.TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY }}
+          RESOURCE_GROUP_NAME: ${{ steps.azure.outputs.RESOURCE_GROUP_NAME }}
+          TERRAFORM_STORAGE_ACCOUNT_NAME: ${{ steps.azure.outputs.TERRAFORM_STORAGE_ACCOUNT_NAME }}
         run: |
-          gh api --method PUT -H "Accept: application/vnd.github+json" repos/${{ github.repository }}/environments/${{ inputs.ENV_NAME }}
-          gh secret set TEST -R ${{ github.repository }} -e ${{ inputs.ENV_NAME }} --body "jsdlkfjdlf"
+          gh api --method PUT repos/${{ github.repository }}/environments/${{ inputs.ENV_NAME }}
+          gh secret set RESOURCE_GROUP_NAME -e ${{ inputs.ENV_NAME }} --body "$RESOURCE_GROUP_NAME"
+          gh secret set TERRAFORM_STORAGE_ACCOUNT_NAME -e ${{ inputs.ENV_NAME }} --body "$TERRAFORM_STORAGE_ACCOUNT_NAME"
+          gh secret set TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY -e ${{ inputs.ENV_NAME }} --body "$TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY"
 
   # azure:
   #   runs-on: ubuntu-latest
