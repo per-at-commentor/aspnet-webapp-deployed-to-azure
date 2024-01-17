@@ -49,14 +49,13 @@ jobs:
             echo "Output variables"
             echo "========================================================="
             echo "::add-mask::$ACCESS_KEY"
-            echo "ACCESS_KEY=$ACCESS_KEY" >> $GITHUB_OUTPUT
+            echo "TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY=$ACCESS_KEY" >> $GITHUB_OUTPUT
+            echo "TERRAFORM_STORAGE_ACCOUNT_NAME=$STORAGE_ACCOUNT_NAME" >> $GITHUB_OUTPUT
             echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_OUTPUT
-            echo "STORAGE_ACCOUNT_NAME=$STORAGE_ACCOUNT_NAME" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Environment
         env:
-          GH_DEBUG: api
-          # the token must have read permissions on "Administration" and write permissions on "Environment", "Secrets" and "Variables"
+          # the token must have read and write permissions to "Administration", "Environment", "Secrets" and "Variables"
           GH_TOKEN: ${{ secrets.ENV_CREATION_TOKEN }}
           TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY: ${{ steps.azure.outputs.TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY }}
           RESOURCE_GROUP_NAME: ${{ steps.azure.outputs.RESOURCE_GROUP_NAME }}
