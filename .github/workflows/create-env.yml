@@ -56,7 +56,8 @@ jobs:
       - name: Create GitHub Environment
         env:
           GH_DEBUG: api
-          GH_TOKEN: ${{ secrets.ADM_ENV_SECRETS_TOKEN }}
+          # the token must have read permissions on "Administration" and write permissions on "Environment", "Secrets" and "Variables"
+          GH_TOKEN: ${{ secrets.ENV_CREATION_TOKEN }}
           TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY: ${{ steps.azure.outputs.TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY }}
           RESOURCE_GROUP_NAME: ${{ steps.azure.outputs.RESOURCE_GROUP_NAME }}
           TERRAFORM_STORAGE_ACCOUNT_NAME: ${{ steps.azure.outputs.TERRAFORM_STORAGE_ACCOUNT_NAME }}
