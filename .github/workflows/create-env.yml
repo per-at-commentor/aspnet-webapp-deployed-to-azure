@@ -43,7 +43,7 @@ jobs:
             az storage account create --resource-group $RESOURCE_GROUP_NAME --name $TERRAFORM_STORAGE_ACCOUNT_NAME --sku Standard_LRS --encryption-services blob
 
             echo "# CREATE TERRAFORM STORAGE CONTAINER"
-            az storage container create --name $CONTAINER_NAME --account-name $TERRAFORM_STORAGE_ACCOUNT_NAME --auth-mode login
+            az storage container create --name $TERRAFORM_STORAGE_CONTAINER_NAME --account-name $TERRAFORM_STORAGE_ACCOUNT_NAME --auth-mode login
 
             echo "# GET TERRAFORM STORAGE ACCESS KEY"
             TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $TERRAFORM_STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv)
