@@ -14,10 +14,6 @@ jobs:
     environment: root
 
     steps:
-      - name: Validate input
-        run: |
-          [[ "${{ inputs.ENV_NAME }}" =~ ^[a-zA-Z][a-zA-Z0-9]*$ ]] || (echo "::error::Environment name must start with a letter and only contain letters and numbers" && exit 1)
-
       - name: Delete GitHub Environment
         id: github
         env:
@@ -29,7 +25,8 @@ jobs:
 
           echo "=== GET RESOURCE GROUP NAME ==="
           gh variable list -R $REPO -e $ENV_NAME
-          RESOURCE_GROUP_NAME=$(gh variable get RESOURCE_GROUP_NAME -R $REPO -e $ENV_NAME)
+          gh variable list -R $REPO -e $ENV_NAME | grep RESOURCE_GROUP_NAME | cut -f 2
+          RESOURCE_GROUP_NAME=$(gh variable list -R $REPO -e $ENV_NAME | grep RESOURCE_GROUP_NAME | cut -f 2)
           echo "$RESOURCE_GROUP_NAME"
           echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_OUTPUT
 
