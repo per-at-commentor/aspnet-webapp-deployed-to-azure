@@ -36,16 +36,16 @@ jobs:
             echo "TERRAFORM_STORAGE_ACCOUNT_NAME=$TERRAFORM_STORAGE_ACCOUNT_NAME" >> $GITHUB_OUTPUT
             echo "TERRAFORM_STORAGE_CONTAINER_NAME=$TERRAFORM_STORAGE_CONTAINER_NAME" >> $GITHUB_OUTPUT
 
-            echo "# CREATE AZURE RESOURCE GROUP"
+            echo "=== CREATE AZURE RESOURCE GROUP [$RESOURCE_GROUP_NAME] ==="
             az group create --name $RESOURCE_GROUP_NAME --location westeurope
 
-            echo "# CREATE TERRAFORM STORAGE ACCOUNT"
+            echo "=== CREATE TERRAFORM STORAGE ACCOUNT [$TERRAFORM_STORAGE_ACCOUNT_NAME] ==="
             az storage account create --resource-group $RESOURCE_GROUP_NAME --name $TERRAFORM_STORAGE_ACCOUNT_NAME --sku Standard_LRS --encryption-services blob
 
-            echo "# CREATE TERRAFORM STORAGE CONTAINER"
+            echo "=== CREATE TERRAFORM STORAGE CONTAINER [$TERRAFORM_STORAGE_CONTAINER_NAME] ==="
             az storage container create --name $TERRAFORM_STORAGE_CONTAINER_NAME --account-name $TERRAFORM_STORAGE_ACCOUNT_NAME --auth-mode login
 
-            echo "# GET TERRAFORM STORAGE ACCESS KEY"
+            echo "=== GET TERRAFORM STORAGE ACCESS KEY ==="
             TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP_NAME --account-name $TERRAFORM_STORAGE_ACCOUNT_NAME --query '[0].value' -o tsv)
             echo "::add-mask::$TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY"
             echo "TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY=$TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY" >> $GITHUB_OUTPUT
@@ -58,13 +58,13 @@ jobs:
           ENV_NAME=${{ inputs.ENV_NAME }}
           REPO=${{ github.repository }}
 
-          echo "# CREATE GITHUB ENV"
+          echo "=== CREATE GITHUB ENV [$ENV_NAME] ==="
           gh api --method PUT repos/$REPO/environments/$ENV_NAME
 
-          echo "# SAVE VARIABLES"
+          echo "=== SAVE VARIABLES ==="
           gh variable set RESOURCE_GROUP_NAME -R $REPO -e $ENV_NAME -b "${{ steps.azure.outputs.RESOURCE_GROUP_NAME }}"
           gh variable set TERRAFORM_STORAGE_ACCOUNT_NAME -R $REPO -e $ENV_NAME -b "${{ steps.azure.outputs.TERRAFORM_STORAGE_ACCOUNT_NAME }}"
           gh variable set TERRAFORM_STORAGE_CONTAINER_NAME -R $REPO -e $ENV_NAME -b "${{ steps.azure.outputs.TERRAFORM_STORAGE_CONTAINER_NAME }}"
 
-          echo "# SAVE SECRETS"
+          echo "=== SAVE SECRETS ==="
           gh secret set TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY -R $REPO -e $ENV_NAME -b "${{ steps.azure.outputs.TERRAFORM_STORAGE_ACCOUNT_ACCESS_KEY }}"

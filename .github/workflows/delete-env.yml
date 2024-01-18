@@ -1,0 +1,53 @@
+name: Delete environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      ENV_NAME:
+        description: Environment
+        type: environment
+        required: true
+
+jobs:
+  create-env:
+    runs-on: ubuntu-latest
+    environment: root
+
+    steps:
+      - name: Validate input
+        run: |
+          [[ "${{ inputs.ENV_NAME }}" =~ ^[a-zA-Z][a-zA-Z0-9]*$ ]] || (echo "::error::Environment name must start with a letter and only contain letters and numbers" && exit 1)
+
+      - name: Delete GitHub Environment
+        id: github
+        env:
+          # the token must have read and write permissions to "Administration", "Environment", "Secrets" and "Variables"
+          GH_TOKEN: ${{ secrets.ENV_CREATION_TOKEN }}
+        run: |
+          ENV_NAME=${{ inputs.ENV_NAME }}
+          REPO=${{ github.repository }}
+
+          echo "=== GET RESOURCE GROUP NAME ==="
+          gh variable get RESOURCE_GROUP_NAME -R $REPO -e $ENV_NAME
+          RESOURCE_GROUP_NAME=$(gh variable get RESOURCE_GROUP_NAME -R $REPO -e $ENV_NAME)
+          echo "$RESOURCE_GROUP_NAME"
+          echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_OUTPUT
+
+          echo "=== DELETE GITHUB ENV [$ENV_NAME] ==="
+
+      #          gh api --method DELETE repos/$REPO/environments/$ENV_NAME
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Delete Azure Resources
+        uses: azure/CLI@v1
+        id: azure
+        with:
+          azcliversion: 2.56.0
+          inlineScript: |
+            RESOURCE_GROUP_NAME=${{ steps.github.outputs.RESOURCE_GROUP_NAME }}
+
+            echo "=== DELETE AZURE RESOURCE GROUP [$RESOURCE_GROUP_NAME] ==="
+
+#            az group delete --name $RESOURCE_GROUP_NAME --location westeurope
