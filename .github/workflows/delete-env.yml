@@ -28,7 +28,7 @@ jobs:
           REPO=${{ github.repository }}
 
           echo "=== GET RESOURCE GROUP NAME ==="
-          gh variable get RESOURCE_GROUP_NAME -R $REPO -e $ENV_NAME
+          gh variable list -R $REPO -e $ENV_NAME
           RESOURCE_GROUP_NAME=$(gh variable get RESOURCE_GROUP_NAME -R $REPO -e $ENV_NAME)
           echo "$RESOURCE_GROUP_NAME"
           echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME" >> $GITHUB_OUTPUT
