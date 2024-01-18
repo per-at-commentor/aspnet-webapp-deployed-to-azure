@@ -43,4 +43,4 @@ jobs:
             RESOURCE_GROUP_NAME=${{ steps.github.outputs.RESOURCE_GROUP_NAME }}
 
             echo "=== DELETE AZURE RESOURCE GROUP [$RESOURCE_GROUP_NAME] ==="
-            az group delete --name $RESOURCE_GROUP_NAME --location westeurope
+            az group delete --name $RESOURCE_GROUP_NAME
