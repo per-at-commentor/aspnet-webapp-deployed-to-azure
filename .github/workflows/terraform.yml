@@ -64,6 +64,10 @@ jobs:
         with:
           name: tfplan
 
+      - name: show files
+        run: |
+          ls -R
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.0.0
         with:
