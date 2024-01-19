@@ -17,6 +17,8 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.0.0
+        with:
+          terraform_version: 1.7.0
 
       - name: Prepare Terraform variables
         run: |
@@ -53,11 +55,9 @@ jobs:
             -backend-config="container_name=${{ vars.TERRAFORM_STORAGE_CONTAINER_NAME }}" \
             -backend-config="key=${{ vars.APP_NAME }}-${{ inputs.ENV_NAME }}.tfstate"
 
-      - name: Upload .terraform.lock.hcl
-        uses: actions/upload-artifact@v4.2.0
-        with:
-          name: .terraform.lock.hcl
-          path: .terraform.lock.hcl
+      - name: Show .terraform.lock.hcl
+        run: |
+          cat .terraform.lock.hcl
 
       - name: Terraform validate
         run: terraform validate
