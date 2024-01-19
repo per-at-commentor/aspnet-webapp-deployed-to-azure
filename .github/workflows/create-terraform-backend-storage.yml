@@ -5,11 +5,11 @@ on:
 
 env:
   RESOURCE_GROUP: ${{ vars.APP_NAME }}-terraform-rg
-  STORAGE_ACCOUNT: ${{ vars.APP_NAME }}-terraform-sa
-  STORAGE_CONTAINER: ${{ vars.APP_NAME }}-terraform-c
+  STORAGE_ACCOUNT: ${{ vars.APP_NAME }}tfstorage
+  STORAGE_CONTAINER: ${{ vars.APP_NAME }}-tfstate
 
 jobs:
-  create-env:
+  create-terraform-storage:
     runs-on: ubuntu-latest
     steps:
       - name: Save Terraform information for other workflows to use
@@ -22,7 +22,7 @@ jobs:
           gh variable set TERRAFORM_STORAGE_CONTAINER_NAME -R $REPO -b $STORAGE_CONTAINER
 
       - name: Azure Login
-        uses: azure/login@v1
+        uses: azure/login@v1.6.1
         with:
           creds: |
             {
@@ -33,22 +33,26 @@ jobs:
             }
 
       - name: Create Resource Group
-        uses: azure/CLI@v1
+        uses: azure/CLI@v1.0.9
         with:
           azcliversion: 2.56.0
           inlineScript: |
             az group create --name $RESOURCE_GROUP --location westeurope
 
       - name: Create Storage Account
-        uses: azure/CLI@v1
+        uses: azure/CLI@v1.0.9
         with:
           azcliversion: 2.56.0
           inlineScript: |
             az storage account create --resource-group $RESOURCE_GROUP --name $STORAGE_ACCOUNT --sku Standard_LRS
 
       - name: Create Storage Container
-        uses: azure/CLI@v1
+        uses: azure/CLI@v1.0.9
         with:
           azcliversion: 2.56.0
           inlineScript: |
             az storage container create --name $STORAGE_CONTAINER --account-name $STORAGE_ACCOUNT --auth-mode login
+
+  save-access-key:
+    needs: create-terraform-storage
+    uses: ./.github/workflows/save-terraform-backend-access-key.yml

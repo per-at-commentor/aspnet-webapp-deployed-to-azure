@@ -16,7 +16,7 @@ jobs:
         run: |
           [[ "${{ inputs.ENV_NAME }}" =~ ^[a-zA-Z][a-zA-Z0-9]*$ ]] || (echo "::error::Environment name must start with a letter and only contain letters and numbers" && exit 1)
 
-      - uses: azure/login@v1
+      - uses: azure/login@v1.6.1
         with:
           creds: |
             {
@@ -27,7 +27,7 @@ jobs:
             }
 
       - name: Create Azure Resources
-        uses: azure/CLI@v1
+        uses: azure/CLI@v1.0.9
         id: azure
         with:
           azcliversion: 2.56.0

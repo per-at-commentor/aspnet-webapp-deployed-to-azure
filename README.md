@@ -4,7 +4,7 @@ Experiment with deploying an asp.net web application to azure
 
 # Application name
 
-Create a repository variable `APP_NAME` with a short simple name of the application. It will be used as part of the name of Azure resources. It should only contain lowercase letters and numbers. No spaces, hyphens, underscores or other special charactors.
+Create a repository variable `APP_NAME` with a short simple name of the application. It will be used as part of the name of Azure resources. It should only contain lowercase letters and numbers. No spaces, hyphens, underscores or other special charactors. And be no longer than 10 charators long.
 
 # Access to GitHub from GitHub workflows
 

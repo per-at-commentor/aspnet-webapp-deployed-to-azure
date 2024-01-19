@@ -1,0 +1,38 @@
+name: Save Terraform backend access key from Azure
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  update-access-key:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1.6.1
+        with:
+          creds: |
+            {
+              "clientId": "${{ vars.WORKFLOW_AZURE_CLIENT_ID }}",
+              "clientSecret": "${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}",
+              "subscriptionId": "${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}",
+              "tenantId": "${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
+            }
+
+      - name: Get backend access key from Azure
+        id: access-key
+        uses: azure/CLI@v1.0.9
+        with:
+          azcliversion: 2.56.0
+          inlineScript: |
+            ARM_ACCESS_KEY=$(az storage account keys list --resource-group ${{ vars.TERRAFORM_RESOURCE_GROUP_NAME }} --account-name ${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }} --query '[0].value' -o tsv)
+            echo "::add-mask::$ARM_ACCESS_KEY"
+            echo "ARM_ACCESS_KEY=$ARM_ACCESS_KEY" >> $GITHUB_OUTPUT
+
+      - name: Save access key
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ARM_ACCESS_KEY: ${{ steps.access-key.outputs.ARM_ACCESS_KEY }}
+        run: |
+          gh secret set TERRAFORM_ACCESS_KEY -R $REPO -b $ARM_ACCESS_KEY
