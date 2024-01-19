@@ -5,8 +5,8 @@ on:
 
 env:
   RESOURCE_GROUP: ${{ vars.APP_NAME }}-terraform-rg
-  STORAGE_ACCOUNT: ${{ vars.APP_NAME }}terraform
-  STORAGE_CONTAINER: tfstate
+  STORAGE_ACCOUNT: ${{ vars.APP_NAME }}tfstorage
+  STORAGE_CONTAINER: ${{ vars.APP_NAME }}-tfstate
 
 jobs:
   create-terraform-storage:
