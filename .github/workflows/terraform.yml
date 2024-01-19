@@ -9,10 +9,21 @@ on:
         required: true
 
 jobs:
-  create-env:
+  terraform:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: |
+            {
+              "clientId": "${{ vars.WORKFLOW_AZURE_CLIENT_ID }}",
+              "clientSecret": "${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}",
+              "subscriptionId": "${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}",
+              "tenantId": "${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
+            }
 
       - name: Terraform Input Variables
         run: |
