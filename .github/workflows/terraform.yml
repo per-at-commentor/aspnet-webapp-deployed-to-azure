@@ -65,7 +65,13 @@ jobs:
           export ARM_TENANT_ID="${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
           export ARM_CLIENT_ID="${{ vars.WORKFLOW_AZURE_CLIENT_ID }}"
           export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
-          terraform plan
+          terraform plan -out=tfplan
+
+      - name: Upload tfplan
+        uses: actions/upload-artifact@v3
+        with:
+          name: tfplan
+          path: tfplan
 
       - name: Terraform Apply
         run: |
@@ -73,4 +79,4 @@ jobs:
           export ARM_TENANT_ID="${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
           export ARM_CLIENT_ID="${{ vars.WORKFLOW_AZURE_CLIENT_ID }}"
           export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
-          terraform apply
+          terraform apply tfplan
