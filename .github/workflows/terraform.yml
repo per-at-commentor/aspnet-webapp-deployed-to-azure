@@ -28,7 +28,7 @@ jobs:
 
       - name: Show files
         run: |
-          ls -AR --ignore=src
+          ls -AR --ignore=src --ignore=.github --ignore=.git
 
       - name: Terraform init
         run: |
@@ -41,7 +41,7 @@ jobs:
 
       - name: Show files
         run: |
-          ls -AR --ignore=src
+          ls -AR --ignore=src --ignore=.github --ignore=.git
 
       - name: Show .terraform.lock.hcl
         run: |
@@ -60,7 +60,7 @@ jobs:
 
       - name: Show files
         run: |
-          ls -AR --ignore=src
+          ls -AR --ignore=src --ignore=.github --ignore=.git
 
       - name: Upload files
         uses: actions/upload-artifact@v4.2.0
