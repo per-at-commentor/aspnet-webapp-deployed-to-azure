@@ -1,0 +1,54 @@
+name: Create Terraform backend storage
+
+on:
+  workflow_dispatch:
+
+env:
+  RESOURCE_GROUP: ${{ vars.APP_NAME }}-terraform-rg
+  STORAGE_ACCOUNT: ${{ vars.APP_NAME }}-terraform-sa
+  STORAGE_CONTAINER: ${{ vars.APP_NAME }}-terraform-c
+
+jobs:
+  create-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Save Terraform information for other workflows to use
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh variable set TERRAFORM_RESOURCE_GROUP_NAME -R $REPO -b $RESOURCE_GROUP
+          gh variable set TERRAFORM_STORAGE_ACCOUNT_NAME -R $REPO -b $STORAGE_ACCOUNT
+          gh variable set TERRAFORM_STORAGE_CONTAINER_NAME -R $REPO -b $STORAGE_CONTAINER
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: |
+            {
+              "clientId": "${{ vars.WORKFLOW_AZURE_CLIENT_ID }}",
+              "clientSecret": "${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}",
+              "subscriptionId": "${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}",
+              "tenantId": "${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
+            }
+
+      - name: Create Resource Group
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.56.0
+          inlineScript: |
+            az group create --name $RESOURCE_GROUP --location westeurope
+
+      - name: Create Storage Account
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.56.0
+          inlineScript: |
+            az storage account create --resource-group $RESOURCE_GROUP --name $STORAGE_ACCOUNT --sku Standard_LRS
+
+      - name: Create Storage Container
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.56.0
+          inlineScript: |
+            az storage container create --name $STORAGE_CONTAINER --account-name $STORAGE_ACCOUNT --auth-mode login

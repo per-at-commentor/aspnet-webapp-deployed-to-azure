@@ -1,0 +1,45 @@
+name: Terraform
+
+on:
+  workflow_dispatch:
+    inputs:
+      ENV_NAME:
+        description: Environment name
+        type: environment
+        required: true
+
+jobs:
+  create-env:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Terraform Input Variables
+        run: |
+          echo "APP_NAME=${{ vars.APP_NAME }}" >> terraform.tfvars
+          echo "ENV_NAME=${{ inputs.ENV_NAME }}" >> terraform.tfvars
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: |
+          export ARM_ACCESS_KEY=$(az storage account keys list --resource-group ${{ vars.TERRAFORM_RESOURCE_GROUP_NAME }} --account-name ${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }} --query '[0].value' -o tsv)
+          echo "::add-mask::$ARM_ACCESS_KEY"
+          terraform init \
+            -backend-config="resource_group_name=${{ vars.TERRAFORM_RESOURCE_GROUP_NAME }}" \
+            -backend-config="storage_account_name=${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="container_name=${{ vars.TERRAFORM_STORAGE_CONTAINER_NAME }}" \
+            -backend-config="key=${{ vars.APP_NAME }}-${{ inputs.ENV_NAME }}.tfstate"
+
+      - name: Terraform Plan
+        run: |
+          terraform plan
+
+      - name: Terraform Apply
+        run: |
+          export ARM_SUBSCRIPTION_ID="${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}"
+          export ARM_TENANT_ID="${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
+          export ARM_CLIENT_ID="${{ vars.WORKFLOW_AZURE_CLIENT_ID }}"
+          export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
+          terraform apply
