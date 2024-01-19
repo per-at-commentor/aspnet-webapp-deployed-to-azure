@@ -11,8 +11,6 @@ on:
 jobs:
   create-env:
     runs-on: ubuntu-latest
-    environment: root
-
     steps:
       - name: Validate input
         run: |
@@ -20,7 +18,13 @@ jobs:
 
       - uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: |
+            {
+              "clientId": "${{ vars.AZURE_CLIENT_ID }}",
+              "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}",
+              "subscriptionId": "${{ vars.AZURE_SUBSCRIPTION_ID }}",
+              "tenantId": "${{ vars.AZURE_TENANT_ID }}"
+            }
 
       - name: Create Azure Resources
         uses: azure/CLI@v1
@@ -54,10 +58,9 @@ jobs:
         env:
           # the token must have read and write permissions to "Administration", "Environment", "Secrets" and "Variables"
           GH_TOKEN: ${{ secrets.ENV_CREATION_TOKEN }}
+          ENV_NAME: ${{ inputs.ENV_NAME }}
+          REPO: ${{ github.repository }}
         run: |
-          ENV_NAME=${{ inputs.ENV_NAME }}
-          REPO=${{ github.repository }}
-
           echo "=== CREATE GITHUB ENV [$ENV_NAME] ==="
           gh api --method PUT repos/$REPO/environments/$ENV_NAME
 
