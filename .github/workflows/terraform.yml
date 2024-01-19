@@ -26,10 +26,6 @@ jobs:
         with:
           terraform_version: 1.7.0
 
-      - name: Show files
-        run: |
-          ls -AR --ignore=src --ignore=.github --ignore=.git
-
       - name: Terraform init
         run: |
           export ARM_ACCESS_KEY=${{ secrets.TERRAFORM_ACCESS_KEY }}
@@ -38,14 +34,6 @@ jobs:
             -backend-config="storage_account_name=${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }}" \
             -backend-config="container_name=${{ vars.TERRAFORM_STORAGE_CONTAINER_NAME }}" \
             -backend-config="key=${{ vars.APP_NAME }}-${{ inputs.ENV_NAME }}.tfstate"
-
-      - name: Show files
-        run: |
-          ls -AR --ignore=src --ignore=.github --ignore=.git
-
-      - name: Show .terraform.lock.hcl
-        run: |
-          cat .terraform.lock.hcl
 
       - name: Terraform validate
         run: terraform validate
@@ -58,14 +46,10 @@ jobs:
           export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
           terraform plan -out=tfplan
 
-      - name: Show files
-        run: |
-          ls -AR --ignore=src --ignore=.github --ignore=.git
-
       - name: Upload files
         uses: actions/upload-artifact@v4.2.0
         with:
-          name: plan
+          name: files
           path: |
             terraform.tfvars
             .terraform.lock.hcl
