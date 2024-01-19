@@ -20,8 +20,8 @@ jobs:
 
       - name: Prepare Terraform variables
         run: |
-          echo "APP_NAME=${{ vars.APP_NAME }}" >> terraform.tfvars
-          echo "ENV_NAME=${{ inputs.ENV_NAME }}" >> terraform.tfvars
+          echo 'APP_NAME="${{ vars.APP_NAME }}"' >> terraform.tfvars
+          echo 'ENV_NAME="${{ inputs.ENV_NAME }}"' >> terraform.tfvars
 
       - name: Azure Login
         uses: azure/login@v1
