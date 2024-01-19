@@ -11,17 +11,15 @@ on:
 jobs:
   create-env:
     runs-on: ubuntu-latest
-    environment: root
     steps:
       - name: Delete GitHub Environment
         id: github
         env:
           # the token must have read and write permissions to "Administration", "Environment", "Secrets" and "Variables"
           GH_TOKEN: ${{ secrets.ENV_CREATION_TOKEN }}
+          ENV_NAME: ${{ inputs.ENV_NAME }}
+          REPO: ${{ github.repository }}
         run: |
-          ENV_NAME=${{ inputs.ENV_NAME }}
-          REPO=${{ github.repository }}
-
           echo "=== GET RESOURCE GROUP NAME ==="
           RESOURCE_GROUP_NAME=$(gh variable list -R $REPO -e $ENV_NAME | grep RESOURCE_GROUP_NAME | cut -f 2)
           echo $RESOURCE_GROUP_NAME

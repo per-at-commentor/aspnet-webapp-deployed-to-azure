@@ -11,8 +11,6 @@ on:
 jobs:
   create-env:
     runs-on: ubuntu-latest
-    environment: root
-
     steps:
       - name: Validate input
         run: |
@@ -60,10 +58,9 @@ jobs:
         env:
           # the token must have read and write permissions to "Administration", "Environment", "Secrets" and "Variables"
           GH_TOKEN: ${{ secrets.ENV_CREATION_TOKEN }}
+          ENV_NAME: ${{ inputs.ENV_NAME }}
+          REPO: ${{ github.repository }}
         run: |
-          ENV_NAME=${{ inputs.ENV_NAME }}
-          REPO=${{ github.repository }}
-
           echo "=== CREATE GITHUB ENV [$ENV_NAME] ==="
           gh api --method PUT repos/$REPO/environments/$ENV_NAME
 
