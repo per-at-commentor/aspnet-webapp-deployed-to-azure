@@ -28,7 +28,7 @@ jobs:
           echo "=== DELETE GITHUB ENV [$ENV_NAME] ==="
           gh api --method DELETE repos/$REPO/environments/$ENV_NAME
 
-      - uses: azure/login@v1
+      - uses: azure/login@v1.6.1
         with:
           creds: |
             {
@@ -39,7 +39,7 @@ jobs:
             }
 
       - name: Delete Azure Resources
-        uses: azure/CLI@v1
+        uses: azure/CLI@v1.0.9
         id: azure
         with:
           azcliversion: 2.56.0

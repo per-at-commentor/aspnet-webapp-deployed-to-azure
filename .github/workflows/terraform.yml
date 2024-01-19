@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4.1.1
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3.0.0
 
       - name: Prepare Terraform variables
         run: |
@@ -24,7 +24,7 @@ jobs:
           echo 'ENV_NAME="${{ inputs.ENV_NAME }}"' >> terraform.tfvars
 
       - name: Azure Login
-        uses: azure/login@v1
+        uses: azure/login@v1.6.1
         with:
           creds: |
             {
@@ -36,7 +36,7 @@ jobs:
 
       - name: Get backend access key from Azure
         id: access-key
-        uses: azure/CLI@v1
+        uses: azure/CLI@v1.0.9
         with:
           azcliversion: 2.56.0
           inlineScript: |
@@ -54,7 +54,7 @@ jobs:
             -backend-config="key=${{ vars.APP_NAME }}-${{ inputs.ENV_NAME }}.tfstate"
 
       - name: Upload .terraform.lock.hcl
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.2.0
         with:
           name: .terraform.lock.hcl
           path: .terraform.lock.hcl
@@ -68,7 +68,7 @@ jobs:
           terraform plan -out=tfplan
 
       - name: Upload tfplan
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.2.0
         with:
           name: tfplan
           path: tfplan
