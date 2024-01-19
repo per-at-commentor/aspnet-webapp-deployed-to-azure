@@ -19,11 +19,16 @@ jobs:
         run: |
           echo 'APP_NAME="${{ vars.APP_NAME }}"' >> terraform.tfvars
           echo 'ENV_NAME="${{ inputs.ENV_NAME }}"' >> terraform.tfvars
+          cat terraform.tfvars
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.0.0
         with:
           terraform_version: 1.7.0
+
+      - name: Show files
+        run: |
+          ls -R
 
       - name: Terraform init
         run: |
@@ -33,6 +38,10 @@ jobs:
             -backend-config="storage_account_name=${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }}" \
             -backend-config="container_name=${{ vars.TERRAFORM_STORAGE_CONTAINER_NAME }}" \
             -backend-config="key=${{ vars.APP_NAME }}-${{ inputs.ENV_NAME }}.tfstate"
+
+      - name: Show files
+        run: |
+          ls -R
 
       - name: Show .terraform.lock.hcl
         run: |
@@ -49,32 +58,31 @@ jobs:
           export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
           terraform plan -out=tfplan
 
-      - name: Upload tfplan
+      - name: Show files
+        run: |
+          ls -R
+
+      - name: Upload files
         uses: actions/upload-artifact@v4.2.0
         with:
-          name: tfplan
-          path: tfplan
+          name: plan
+          path: |
+            terraform.tfvars
+            .terraform.lock.hcl
+            tfplan
 
-  approval:
+  terraform-apply:
     runs-on: ubuntu-latest
     needs: terraform-plan
     environment: ${{ inputs.ENV_NAME }}
     steps:
-      - name: test
-        run: |
-          printenv
-
-  terraform-apply:
-    runs-on: ubuntu-latest
-    needs: approval
-    steps:
       - name: Checkout repository
         uses: actions/checkout@v4.1.1
 
-      - name: Download tfplan
+      - name: Download files
         uses: actions/download-artifact@v4.1.1
         with:
-          name: tfplan
+          name: files
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.0.0
