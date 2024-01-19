@@ -44,7 +44,7 @@ jobs:
             echo "::add-mask::$ARM_ACCESS_KEY"
             echo "ARM_ACCESS_KEY=$ARM_ACCESS_KEY" >> $GITHUB_OUTPUT
 
-      - name: Terraform Init
+      - name: Terraform init
         run: |
           export ARM_ACCESS_KEY=${{ steps.access-key.outputs.ARM_ACCESS_KEY }}
           terraform init \
@@ -59,7 +59,10 @@ jobs:
           name: .terraform.lock.hcl
           path: .terraform.lock.hcl
 
-      - name: Terraform Plan
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
         run: |
           export ARM_SUBSCRIPTION_ID="${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}"
           export ARM_TENANT_ID="${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
@@ -73,7 +76,7 @@ jobs:
           name: tfplan
           path: tfplan
 
-      - name: Terraform Apply
+      - name: Terraform apply
         run: |
           export ARM_SUBSCRIPTION_ID="${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}"
           export ARM_TENANT_ID="${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
