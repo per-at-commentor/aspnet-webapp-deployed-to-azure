@@ -25,7 +25,7 @@ resource "azurerm_resource_group" "rg" {
 
 # Create App Service Plan
 resource "azurerm_service_plan" "serviceplan" {
-  name                = "${var.APP_NAME}-serviceplan"
+  name                = "${var.APP_NAME}-${var.ENV_NAME}-serviceplan"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   os_type             = "Linux"
@@ -34,7 +34,7 @@ resource "azurerm_service_plan" "serviceplan" {
 
 # Create Web App
 resource "azurerm_linux_web_app" "webapp2" {
-  name                  = "${var.APP_NAME}-webapp"
+  name                  = "${var.APP_NAME}-${var.ENV_NAME}-webapp"
   location              = azurerm_resource_group.rg.location
   resource_group_name   = azurerm_resource_group.rg.name
   service_plan_id       = azurerm_service_plan.serviceplan.id
