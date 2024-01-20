@@ -90,14 +90,16 @@ jobs:
           export ARM_CLIENT_ID="${{ vars.WORKFLOW_AZURE_CLIENT_ID }}"
           export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
           terraform apply tfplan
+          echo "RESOURCE_GROUP_NAME=$(terraform output -raw resource_group_name)" >> $GITHUB_OUTPUT
+          echo "WEBAPP_NAME=$(terraform output -raw webapp_name)" >> $GITHUB_OUTPUT
 
       - name: Save environment variables
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           ENV_NAME: ${{ inputs.ENV_NAME }}
-          RESOURCE_GROUP_NAME: ${{ steps.tf-apply.outputs.resource_group_name }}
-          WEBAPP_NAME: ${{ steps.tf-apply.outputs.webapp_name }}
+          RESOURCE_GROUP_NAME: ${{ steps.tf-apply.outputs.RESOURCE_GROUP_NAME }}
+          WEBAPP_NAME: ${{ steps.tf-apply.outputs.WEBAPP_NAME }}
         run: |
           gh variable set RESOURCE_GROUP_NAME -R $REPO -e $ENV_NAME -b $RESOURCE_GROUP_NAME
           gh variable set WEBAPP_NAME -R $REPO -e $ENV_NAME -b $WEBAPP_NAME
