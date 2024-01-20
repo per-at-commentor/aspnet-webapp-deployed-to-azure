@@ -1,4 +1,4 @@
-name: Save environment secrets
+name: Update webapp publish profile
 
 on:
   workflow_dispatch:
@@ -17,6 +17,7 @@ on:
 jobs:
   webapp-publish-profile:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.ENV_NAME }}
     steps:
       - name: Azure Login
         uses: azure/login@v1.6.1

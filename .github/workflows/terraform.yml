@@ -104,8 +104,9 @@ jobs:
           gh variable set RESOURCE_GROUP_NAME -R $REPO -e $ENV_NAME -b $RESOURCE_GROUP_NAME
           gh variable set WEBAPP_NAME -R $REPO -e $ENV_NAME -b $WEBAPP_NAME
 
-  save-environment-secrets:
+  update-webapp-publish-profile:
     needs: terraform-apply
-    uses: ./.github/workflows/save-environment-secrets.yml
+    uses: ./.github/workflows/update-webapp-publish-profile.yml
     with:
       ENV_NAME: ${{ inputs.ENV_NAME }}
+    secrets: inherit

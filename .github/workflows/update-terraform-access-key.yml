@@ -1,4 +1,4 @@
-name: Save Terraform backend secrets
+name: Update Terraform backend access key
 
 on:
   workflow_dispatch:

@@ -55,4 +55,5 @@ jobs:
 
   save-backend-secrets:
     needs: create-terraform-storage
-    uses: ./.github/workflows/save-terraform-backend-secrets.yml
+    uses: ./.github/workflows/update-terraform-access-key.yml
+    secrets: inherit
