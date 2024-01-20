@@ -35,4 +35,4 @@ jobs:
           REPO: ${{ github.repository }}
           ARM_ACCESS_KEY: ${{ steps.access-key.outputs.ARM_ACCESS_KEY }}
         run: |
-          gh secret set TERRAFORM_ACCESS_KEY -R $REPO -b $ARM_ACCESS_KEY
+          gh secret set TERRAFORM_ACCESS_KEY -R $REPO -b "$ARM_ACCESS_KEY"
