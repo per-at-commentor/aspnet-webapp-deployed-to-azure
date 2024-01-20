@@ -36,8 +36,10 @@ jobs:
         with:
           azcliversion: 2.56.0
           inlineScript: |
-            az webapp deployment list-publishing-profiles --name "${{ vars.WEBAPP_NAME }}" --resource-group "${{ vars.RESOURCE_GROUP_NAME }}"
-            echo "WEBAPP_PUBLISH_PROFILE=TODO" >> $GITHUB_OUTPUT
+            WEBAPP_PUBLISH_PROFILE=$(az webapp deployment list-publishing-profiles --xml --name "${{ vars.WEBAPP_NAME }}" --resource-group "${{ vars.RESOURCE_GROUP_NAME }}")
+            echo $WEBAPP_PUBLISH_PROFILE
+            echo "::add-mask::$WEBAPP_PUBLISH_PROFILE"
+            echo "WEBAPP_PUBLISH_PROFILE=$WEBAPP_PUBLISH_PROFILE" >> $GITHUB_OUTPUT
 
       - name: Save webapp publish profile in GitHub environment secret
         env:
