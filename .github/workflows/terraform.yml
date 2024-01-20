@@ -7,6 +7,12 @@ on:
         description: Environment name
         type: environment
         required: true
+  workflow_call:
+    inputs:
+      ENV_NAME:
+        description: Environment name
+        type: string
+        required: true
 
 jobs:
   terraform-plan:
