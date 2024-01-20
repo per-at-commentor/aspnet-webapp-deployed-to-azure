@@ -37,7 +37,9 @@ jobs:
           azcliversion: 2.56.0
           inlineScript: |
             WEBAPP_PUBLISH_PROFILE=$(az webapp deployment list-publishing-profiles --xml --name "${{ vars.WEBAPP_NAME }}" --resource-group "${{ vars.RESOURCE_GROUP_NAME }}")
+            echo ">>$WEBAPP_PUBLISH_PROFILE<<"
             WEBAPP_PUBLISH_PROFILE_BASE64=$(echo "$WEBAPP_PUBLISH_PROFILE" | base64)
+            echo ">>$WEBAPP_PUBLISH_PROFILE_BASE64<<"
             echo "::add-mask::$WEBAPP_PUBLISH_PROFILE_BASE64"
             echo "WEBAPP_PUBLISH_PROFILE_BASE64=$WEBAPP_PUBLISH_PROFILE_BASE64" >> $GITHUB_OUTPUT
 
