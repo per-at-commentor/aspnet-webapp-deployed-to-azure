@@ -46,10 +46,10 @@ jobs:
           export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
           terraform plan -out=tfplan
 
-      - name: Upload files
+      - name: Upload Terraform files
         uses: actions/upload-artifact@v4.2.0
         with:
-          name: files
+          name: tf-files
           path: |
             terraform.tfvars
             .terraform.lock.hcl
@@ -63,10 +63,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4.1.1
 
-      - name: Download files
+      - name: Download Terraform files
         uses: actions/download-artifact@v4.1.1
         with:
-          name: files
+          name: tf-files
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.0.0
