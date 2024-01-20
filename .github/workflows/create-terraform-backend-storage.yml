@@ -53,6 +53,6 @@ jobs:
           inlineScript: |
             az storage container create --name $STORAGE_CONTAINER --account-name $STORAGE_ACCOUNT --auth-mode login
 
-  save-access-key:
+  save-backend-secrets:
     needs: create-terraform-storage
-    uses: ./.github/workflows/save-terraform-backend-access-key.yml
+    uses: ./.github/workflows/save-terraform-backend-secrets.yml

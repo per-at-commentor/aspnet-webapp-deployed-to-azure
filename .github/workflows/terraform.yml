@@ -83,9 +83,25 @@ jobs:
             -backend-config="key=${{ vars.APP_NAME }}-${{ inputs.ENV_NAME }}.tfstate"
 
       - name: Terraform apply
+        id: tf-apply
         run: |
           export ARM_SUBSCRIPTION_ID="${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}"
           export ARM_TENANT_ID="${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
           export ARM_CLIENT_ID="${{ vars.WORKFLOW_AZURE_CLIENT_ID }}"
           export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
           terraform apply tfplan
+
+      - name: Save environment variables
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ENV_NAME: ${{ inputs.ENV_NAME }}
+          RESOURCE_GROUP_NAME: ${{ steps.tf-apply.outputs.resource_group_name }}
+          WEBAPP_NAME: ${{ steps.tf-apply.outputs.webapp_name }}
+        run: |
+          gh variable set RESOURCE_GROUP_NAME -R $REPO -e $ENV_NAME -b $RESOURCE_GROUP_NAME
+          gh variable set WEBAPP_NAME -R $REPO -e $ENV_NAME -b $WEBAPP_NAME
+
+  save-environment-secrets:
+    needs: terraform-apply
+    uses: ./.github/workflows/save-environment-secrets.yml
