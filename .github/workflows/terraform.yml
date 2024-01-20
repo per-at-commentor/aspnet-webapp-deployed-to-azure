@@ -105,3 +105,5 @@ jobs:
   save-environment-secrets:
     needs: terraform-apply
     uses: ./.github/workflows/save-environment-secrets.yml
+    with:
+      ENV_NAME: ${{ inputs.ENV_NAME }}
