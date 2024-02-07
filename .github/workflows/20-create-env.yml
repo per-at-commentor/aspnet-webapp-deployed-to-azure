@@ -1,0 +1,34 @@
+name: 20 Create environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      ENV_NAME:
+        description: Environment name
+        type: string
+        required: true
+
+jobs:
+  create-github-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate input
+        run: |
+          [[ "${{ inputs.ENV_NAME }}" =~ ^[a-zA-Z][a-zA-Z0-9]*$ ]] || (echo "::error::Environment name must start with a letter and only contain letters and numbers" && exit 1)
+
+      
+      - name: Create GitHub Environment
+        env:
+          GH_TOKEN: ${{ secrets.ENV_CREATION_TOKEN }}
+          ENV_NAME: ${{ inputs.ENV_NAME }}
+          REPO: ${{ github.repository }}
+        run: |
+          echo "=== CREATE GITHUB ENV [$ENV_NAME] ==="
+          gh api --method PUT repos/$REPO/environments/$ENV_NAME
+
+  terraform:
+    needs: create-github-env
+    uses: ./.github/workflows/21-update-env.yml
+    with:
+      ENV_NAME: ${{ inputs.ENV_NAME }}
+    secrets: inherit

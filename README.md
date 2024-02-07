@@ -21,7 +21,7 @@ Terraform is used to manage the Azure resources for the environments. Terraform 
 
 # Create environment
 
-The GitHub workflow `Create environment` can be used to create a new environment. It will create an environment i GitHub used for environment specific variables and secrets. It then calls the `Teraform` workflow to create a resource group in Azure with the resources required to run the application. The workflow takes an environment name that must be short and without spaces or special charcators. The name is used in some of the Azure resource names.
+The GitHub workflow `Create environment` can be used to create a new environment. It will create an environment i GitHub used for environment specific variables and secrets. It then calls the `Update environment` workflow to create a resource group in Azure with the resources required to run the application. The workflow takes an environment name that must be short and without spaces or special charcators. The name is used in some of the Azure resource names.
 
 Note that this does not deploy the application.
 
@@ -29,7 +29,7 @@ Note that this does not deploy the application.
 
 The file `terraform.tf` describes the Azure resources needed in an environment to run the application.
 
-If this is changed you can run the GitHub workflow `Terraform` on existing environments to update them.
+If this is changed you can run the GitHub workflow `Update environment` on existing environments to update them.
 
 # Delete environment
 
