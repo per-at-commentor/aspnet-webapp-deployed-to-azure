@@ -19,7 +19,7 @@ jobs:
       
       - name: Create GitHub Environment
         env:
-          GH_TOKEN: ${{ secrets.ENV_CREATION_TOKEN }}
+          GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
           ENV_NAME: ${{ inputs.ENV_NAME }}
           REPO: ${{ github.repository }}
         run: |
