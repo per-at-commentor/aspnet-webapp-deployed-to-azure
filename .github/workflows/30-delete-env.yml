@@ -17,10 +17,10 @@ jobs:
       with:
         creds: |
           {
-            "clientId": "${{ vars.AZURE_CLIENT_ID }}",
-            "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}",
-            "subscriptionId": "${{ vars.AZURE_SUBSCRIPTION_ID }}",
-            "tenantId": "${{ vars.AZURE_TENANT_ID }}"
+            "clientId": "${{ vars.WORKFLOW_AZURE_CLIENT_ID }}",
+            "clientSecret": "${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}",
+            "subscriptionId": "${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}",
+            "tenantId": "${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
           }
 
     - name: Delete Azure Resources
