@@ -9,7 +9,7 @@ on:
         required: true
 
 jobs:
-  delete-env:
+  azure:
     runs-on: ubuntu-latest
     environment: ${{ inputs.ENV_NAME }}
     steps:
@@ -34,6 +34,10 @@ jobs:
           echo "=== DELETE AZURE RESOURCE GROUP [$RESOURCE_GROUP_NAME] ==="
           az group delete --name $RESOURCE_GROUP_NAME --yes
 
+  github:
+    needs: azure
+    runs-on: ubuntu-latest
+    steps:
     - name: Delete GitHub Environment
       id: github
       env:
