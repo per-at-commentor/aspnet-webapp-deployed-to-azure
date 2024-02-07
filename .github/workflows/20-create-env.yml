@@ -9,7 +9,7 @@ on:
         required: true
 
 jobs:
-  create-github-env:
+  github:
     runs-on: ubuntu-latest
     steps:
       - name: Validate input
@@ -26,15 +26,15 @@ jobs:
           echo "=== CREATE GITHUB ENV [$ENV_NAME] ==="
           gh api --method PUT repos/$REPO/environments/$ENV_NAME
 
-  terraform:
-    needs: create-github-env
+  azure:
+    needs: github
     uses: ./.github/workflows/21-update-env.yml
     with:
       ENV_NAME: ${{ inputs.ENV_NAME }}
     secrets: inherit
 
   update-webapp-publish-profile:
-    needs: terraform
+    needs: azure
     uses: ./.github/workflows/22-update-webapp-publish-profile.yml
     with:
       ENV_NAME: ${{ inputs.ENV_NAME }}

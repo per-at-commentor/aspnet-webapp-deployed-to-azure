@@ -13,26 +13,25 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.ENV_NAME }}
     steps:
-    - uses: azure/login@v1.6.1
+    - name: Checkout repository
+      uses: actions/checkout@v4.1.1
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3.0.0
       with:
-        creds: |
-          {
-            "clientId": "${{ vars.WORKFLOW_AZURE_CLIENT_ID }}",
-            "clientSecret": "${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}",
-            "subscriptionId": "${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}",
-            "tenantId": "${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
-          }
+        terraform_version: 1.7.0
 
-    - name: Delete Azure Resources
-      uses: azure/CLI@v1.0.9
-      id: azure
-      with:
-        azcliversion: 2.56.0
-        inlineScript: |
-          RESOURCE_GROUP_NAME=${{ vars.RESOURCE_GROUP_NAME }}
-
-          echo "=== DELETE AZURE RESOURCE GROUP [$RESOURCE_GROUP_NAME] ==="
-          az group delete --name $RESOURCE_GROUP_NAME --yes
+    - name: Terraform init
+      run: |
+        export ARM_ACCESS_KEY=${{ secrets.TERRAFORM_ACCESS_KEY }}
+        terraform init \
+          -backend-config="resource_group_name=${{ vars.TERRAFORM_RESOURCE_GROUP_NAME }}" \
+          -backend-config="storage_account_name=${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }}" \
+          -backend-config="container_name=${{ vars.TERRAFORM_STORAGE_CONTAINER_NAME }}" \
+          -backend-config="key=${{ vars.APP_NAME }}-${{ inputs.ENV_NAME }}.tfstate"
+        
+    - name: Terraform destroy
+      run: terraform destroy --auto-approve
 
   github:
     needs: azure
