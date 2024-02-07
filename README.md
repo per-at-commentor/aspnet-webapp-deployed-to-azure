@@ -37,7 +37,7 @@ The GitHub workflow `Delete environment` deletes the Azure resource group for th
 
 # Test
 
-The GitHub workflow `Test` builds the code and runs automated tests. It is automatically run on pull-requests and when code is committed to the `main` branch.
+The GitHub workflow `Build and Test` builds the code and runs automated tests. It is automatically run on pull-requests and when code is committed to the `main` branch.
 
 # Deploy
 

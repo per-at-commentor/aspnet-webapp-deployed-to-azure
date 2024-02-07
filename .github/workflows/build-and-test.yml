@@ -1,0 +1,35 @@
+name: Build and Test
+
+env:
+  DOTNET_VERSION: 8.0.x
+  SOLUTION_FOLDER: src/WebApplication1
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4.0.0
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION_FOLDER }}
+
+      - name: Build
+        run: dotnet build --no-restore ${{ env.SOLUTION_FOLDER }}
+
+      - name: Test
+        run: dotnet test --no-build --verbosity normal ${{ env.SOLUTION_FOLDER }}
