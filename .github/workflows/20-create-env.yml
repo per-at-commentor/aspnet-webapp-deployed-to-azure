@@ -32,3 +32,10 @@ jobs:
     with:
       ENV_NAME: ${{ inputs.ENV_NAME }}
     secrets: inherit
+
+  update-webapp-publish-profile:
+    needs: terraform
+    uses: ./.github/workflows/22-update-webapp-publish-profile.yml
+    with:
+      ENV_NAME: ${{ inputs.ENV_NAME }}
+    secrets: inherit
