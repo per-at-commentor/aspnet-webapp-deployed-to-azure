@@ -1,4 +1,4 @@
-name: Release pipeline
+name: OLD Release pipeline
 
 env:
   AZURE_WEBAPP_NAME: dev-webapp-pfm

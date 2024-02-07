@@ -1,4 +1,4 @@
-name: Create new environment
+name: OLD Create new environment
 
 on:
   workflow_dispatch:
