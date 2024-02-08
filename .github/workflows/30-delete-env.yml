@@ -15,7 +15,13 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4.1.1
-    
+
+    - name: Prepare Terraform variables
+      run: |
+        echo 'APP_NAME="${{ vars.APP_NAME }}"' >> terraform.tfvars
+        echo 'ENV_NAME="${{ inputs.ENV_NAME }}"' >> terraform.tfvars
+        cat terraform.tfvars
+
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3.0.0
       with:
@@ -29,7 +35,7 @@ jobs:
           -backend-config="storage_account_name=${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }}" \
           -backend-config="container_name=${{ vars.TERRAFORM_STORAGE_CONTAINER_NAME }}" \
           -backend-config="key=${{ vars.APP_NAME }}-${{ inputs.ENV_NAME }}.tfstate"
-        
+
     - name: Terraform destroy
       run: terraform destroy --auto-approve
 
