@@ -26,13 +26,15 @@ jobs:
       uses: hashicorp/setup-terraform@v3.0.0
       with:
         terraform_version: 1.7.0
-
-    - name: Terraform init
+    - name: Export Azure credentials
       run: |
         export ARM_SUBSCRIPTION_ID="${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}"
         export ARM_TENANT_ID="${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
         export ARM_CLIENT_ID="${{ vars.WORKFLOW_AZURE_CLIENT_ID }}"
         export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
+
+    - name: Terraform init
+      run: |
         terraform init \
           -backend-config="resource_group_name=${{ vars.TERRAFORM_RESOURCE_GROUP_NAME }}" \
           -backend-config="storage_account_name=${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }}" \
@@ -41,10 +43,6 @@ jobs:
 
     - name: Terraform destroy
       run: |
-        export ARM_SUBSCRIPTION_ID="${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}"
-        export ARM_TENANT_ID="${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
-        export ARM_CLIENT_ID="${{ vars.WORKFLOW_AZURE_CLIENT_ID }}"
-        export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
         terraform destroy --auto-approve
 
   github:
