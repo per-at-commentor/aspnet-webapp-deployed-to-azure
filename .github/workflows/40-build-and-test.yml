@@ -2,7 +2,7 @@ name: 40 Build and Test
 
 env:
   DOTNET_VERSION: 8.0.x
-  SOLUTION_FOLDER: src/WebApplication1
+  SOLUTION_FOLDER: src
 
 on:
   pull_request:

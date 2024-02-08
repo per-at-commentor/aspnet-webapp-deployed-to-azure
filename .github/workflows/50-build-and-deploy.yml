@@ -22,7 +22,7 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Build webapp
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:VersionSuffix=snapshot src/WebApplication1/WebApplication1
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:VersionSuffix=snapshot src/WebApplication1
 
       - name: Decode publish profile
         id: publish-profile
