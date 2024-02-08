@@ -1,9 +1,5 @@
 name: 40 Build and Test
 
-env:
-  DOTNET_VERSION: 8.0.x
-  SOLUTION_FOLDER: src
-
 on:
   pull_request:
     branches:
@@ -27,13 +23,13 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4.0.0
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-version: 8.0.x
 
       - name: Restore
-        run: dotnet restore ${{ env.SOLUTION_FOLDER }}
+        run: dotnet restore src
 
       - name: Build
-        run: dotnet build --no-restore ${{ env.SOLUTION_FOLDER }}
+        run: dotnet build --no-restore src
 
       - name: Test
-        run: dotnet test --no-build --verbosity normal ${{ env.SOLUTION_FOLDER }}
+        run: dotnet test --no-build --verbosity normal src
