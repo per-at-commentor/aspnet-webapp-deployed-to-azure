@@ -41,4 +41,4 @@ The GitHub workflow `Build and Test` builds the code and runs automated tests. I
 
 # Deploy
 
-The GitHub workflow `Deploy` builds and deploys the code to an environment. It is executed manually with the environment as input.
+The GitHub workflow `Build and Deploy` builds and deploys the code to an environment. It is executed manually with the environment as input.
