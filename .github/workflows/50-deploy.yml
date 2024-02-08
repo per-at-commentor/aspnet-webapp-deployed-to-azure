@@ -24,26 +24,19 @@ jobs:
       - name: Build webapp
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:VersionSuffix=snapshot src/WebApplication1/WebApplication1
 
-      - name: Azure Login
-        uses: azure/login@v1.6.1
-        with:
-          creds: |
-            {
-              "clientId": "${{ vars.WORKFLOW_AZURE_CLIENT_ID }}",
-              "clientSecret": "${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}",
-              "subscriptionId": "${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}",
-              "tenantId": "${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
-            }
-
-      - name: Get publish profile
+      - name: Decode publish profile
+        id: publish-profile
+        env:
+          AZURE_WEBAPP_PUBLISH_PROFILE_BASE64: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_BASE64 }}
         run: |
-          AZURE_WEBAPP_PUBLISH_PROFILE_BASE64=${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_BASE64 }}
-          echo "AZURE_WEBAPP_PUBLISH_PROFILE_BASE64=$AZURE_WEBAPP_PUBLISH_PROFILE_BASE64" >> $GITHUB_OUTPUT
           AZURE_WEBAPP_PUBLISH_PROFILE=$(echo "$AZURE_WEBAPP_PUBLISH_PROFILE_BASE64" | base64 --decode)
+          echo "::add-mask::$AZURE_WEBAPP_PUBLISH_PROFILE"
+          echo "AZURE_WEBAPP_PUBLISH_PROFILE=$AZURE_WEBAPP_PUBLISH_PROFILE" >> $GITHUB_OUTPUT
 
       - name: Deploy webapp
         id: deploy-webapp
         uses: azure/webapps-deploy@v3.0.0
         with:
           app-name: ${{ vars.WEBAPP_NAME }}
+          publish-profile: ${{ steps.publish-profile.outputs.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: ${{env.DOTNET_ROOT}}/webapp
