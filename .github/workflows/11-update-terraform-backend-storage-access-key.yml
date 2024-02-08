@@ -1,4 +1,4 @@
-name: 11 Update Terraform backend access key
+name: 11 Update Terraform backend storage access key
 
 on:
   workflow_dispatch:
@@ -25,14 +25,14 @@ jobs:
         with:
           azcliversion: 2.56.0
           inlineScript: |
-            ARM_ACCESS_KEY=$(az storage account keys list --resource-group ${{ vars.TERRAFORM_RESOURCE_GROUP_NAME }} --account-name ${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }} --query '[0].value' -o tsv)
-            echo "::add-mask::$ARM_ACCESS_KEY"
-            echo "ARM_ACCESS_KEY=$ARM_ACCESS_KEY" >> $GITHUB_OUTPUT
+            TERRAFORM_BACKEND_STORAGE_ACCESS_KEY=$(az storage account keys list --resource-group ${{ vars.TERRAFORM_RESOURCE_GROUP_NAME }} --account-name ${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }} --query '[0].value' -o tsv)
+            echo "::add-mask::$TERRAFORM_BACKEND_STORAGE_ACCESS_KEY"
+            echo "TERRAFORM_BACKEND_STORAGE_ACCESS_KEY=$TERRAFORM_BACKEND_STORAGE_ACCESS_KEY" >> $GITHUB_OUTPUT
 
       - name: Save access key in GitHub repository secret
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-          ARM_ACCESS_KEY: ${{ steps.access-key.outputs.ARM_ACCESS_KEY }}
+          TERRAFORM_BACKEND_STORAGE_ACCESS_KEY: ${{ steps.access-key.outputs.TERRAFORM_BACKEND_STORAGE_ACCESS_KEY }}
         run: |
-          gh secret set TERRAFORM_ACCESS_KEY -R $REPO -b "$ARM_ACCESS_KEY"
+          gh secret set TERRAFORM_BACKEND_STORAGE_ACCESS_KEY -R $REPO -b "$TERRAFORM_BACKEND_STORAGE_ACCESS_KEY"

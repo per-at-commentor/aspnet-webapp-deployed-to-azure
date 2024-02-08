@@ -34,7 +34,7 @@ jobs:
 
       - name: Terraform init
         run: |
-          export ARM_ACCESS_KEY=${{ secrets.TERRAFORM_ACCESS_KEY }}
+          export ARM_ACCESS_KEY=${{ secrets.TERRAFORM_BACKEND_STORAGE_ACCESS_KEY }}
           terraform init \
             -backend-config="resource_group_name=${{ vars.TERRAFORM_RESOURCE_GROUP_NAME }}" \
             -backend-config="storage_account_name=${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }}" \
@@ -81,7 +81,7 @@ jobs:
 
       - name: Terraform init
         run: |
-          export ARM_ACCESS_KEY=${{ secrets.TERRAFORM_ACCESS_KEY }}
+          export ARM_ACCESS_KEY=${{ secrets.TERRAFORM_BACKEND_STORAGE_ACCESS_KEY }}
           terraform init \
             -backend-config="resource_group_name=${{ vars.TERRAFORM_RESOURCE_GROUP_NAME }}" \
             -backend-config="storage_account_name=${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }}" \
