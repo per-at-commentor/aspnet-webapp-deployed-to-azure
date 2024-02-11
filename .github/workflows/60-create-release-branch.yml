@@ -51,7 +51,7 @@ jobs:
         echo "Push release branch to origin"
         git push --set-upstream origin $RELEASE_BRANCH
         echo "Switch back to current branch"
-        git switch $GITHUB_REF
+        git switch $GITHUB_REF_NAME
 
     - name: Update version
       env:
