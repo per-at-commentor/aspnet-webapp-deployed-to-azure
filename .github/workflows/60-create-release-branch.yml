@@ -30,13 +30,13 @@ jobs:
         NEXT_VERSION="$NEXT_MAJOR.$NEXT_MINOR.$NEXT_PATH"
         echo "Next version $NEXT_MAJOR.$NEXT_MINOR.$NEXT_PATCH"
         
-        RELEASE_BRANCH="release/$CURRENT_MAJOR.CURRENT_MINOR"
+        RELEASE_BRANCH="release/$CURRENT_MAJOR.$CURRENT_MINOR"
         echo "Create release branch $RELEASE_BRANCH"
         git switch -c $RELEASE_BRANCH
         echo "Push release branch to origin"
         git push --set-upstream origin $RELEASE_BRANCH
         echo "Switch back to main branch"
-        git swith main
+        git switch main
         echo "Update version in main to $NEXT_VERSION"
         sed -i -znE -e "s|(.*<VersionPrefix>[[:space:]]*)([0-9]+\.[0-9]+\.[0-9]+)([[:space:]]*</VersionPrefix>.*)|\1$NEXT_VERSION\3|p" src/WebApplication1/WebApplication1.csproj
         echo "Commit updated version"
