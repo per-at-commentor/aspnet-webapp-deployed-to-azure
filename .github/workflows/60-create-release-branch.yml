@@ -40,8 +40,7 @@ jobs:
         echo "Update version in main to $NEXT_VERSION"
         sed -i -znE -e "s|(.*<VersionPrefix>[[:space:]]*)([0-9]+\.[0-9]+\.[0-9]+)([[:space:]]*</VersionPrefix>.*)|\1$NEXT_VERSION\3|p" src/WebApplication1/WebApplication1.csproj
         echo "Commit updated version"
-        git add src/WebApplication1/WebApplication1.csproj
-        git commit -m "Update version to $NEXT_VERSION"
+        git commit -a -m "Update version to $NEXT_VERSION"
         echo "Push updated version"
         git push
 
