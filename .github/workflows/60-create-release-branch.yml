@@ -9,7 +9,7 @@ jobs:
     steps:
     - name: Check branch
       run: |
-        [[ "${{ github.ref }}" == "main" ]] || (echo "::error::Workflow is intended to be run on main branch. Not ${{ github.ref }}" && exit 1)
+        [[ "$GITHUB_REF_NAME" == "main" ]] || (echo "::error::Workflow is intended to be run on main branch. Not $GITHUB_REF_NAME" && exit 1)
 
     - name: Checkout
       uses: actions/checkout@v4.1.1
