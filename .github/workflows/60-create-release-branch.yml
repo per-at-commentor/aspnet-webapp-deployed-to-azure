@@ -30,7 +30,7 @@ jobs:
         NEXT_MAJOR=$CURRENT_MAJOR
         NEXT_MINOR=$(echo $CURRENT_MINOR | awk '{$NF += 1 ; print}')
         NEXT_PATCH="0"
-        NEXT_VERSION="$NEXT_MAJOR.$NEXT_MINOR.$NEXT_PATH"
+        NEXT_VERSION="$NEXT_MAJOR.$NEXT_MINOR.$NEXT_PATCH"
         echo "Next version $NEXT_MAJOR.$NEXT_MINOR.$NEXT_PATCH"
         
         RELEASE_BRANCH="release/$CURRENT_MAJOR.$CURRENT_MINOR"
