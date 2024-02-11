@@ -16,6 +16,9 @@ jobs:
     - name: Create branch and bump version on main
       id: version
       run: |
+        git config user.name "Workflow"
+        git config user.email "<>"
+
         CURRENT_VERSION=$(sed -znE -e "s|.*<VersionPrefix>[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+)[[:space:]]*</VersionPrefix>.*|\1|p" src/WebApplication1/WebApplication1.csproj)
         [[ -z $CURRENT_VERSION ]] && (echo "::error::Version not found" && exit 1)
 
