@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - main
+      - release/**
     paths:
       - src/**
   workflow_dispatch:
@@ -17,6 +18,8 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
+
+      - run: echo "test"
       - name: Checkout
         uses: actions/checkout@v4.1.1
 
