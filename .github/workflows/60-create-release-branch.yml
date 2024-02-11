@@ -7,18 +7,16 @@ jobs:
   minor-release:
     runs-on: ubuntu-latest
     steps:
-      
+    - name: Check branch
+      run: |
+        [[ $GITHUB_REF == "main" ]] || (echo "::error::Workflow is intended to be run on main branch" && exit 1)
+
     - name: Checkout
       uses: actions/checkout@v4.1.1
-      with:
-        ref: main
 
-    - name: Create branch and bump version on main
+    - name: Get version
       id: version
       run: |
-        git config user.name "Workflow"
-        git config user.email "<>"
-
         CURRENT_VERSION=$(sed -znE -e "s|.*<VersionPrefix>[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+)[[:space:]]*</VersionPrefix>.*|\1|p" src/WebApplication1/WebApplication1.csproj)
         [[ -z $CURRENT_VERSION ]] && (echo "::error::Version not found" && exit 1)
 
@@ -26,25 +24,42 @@ jobs:
         CURRENT_MINOR=$(echo $CURRENT_VERSION | sed -nE "s|([0-9]+)\.([0-9]+)\.([0-9]+)|\2|p")
         CURRENT_PATCH=$(echo $CURRENT_VERSION | sed -nE "s|([0-9]+)\.([0-9]+)\.([0-9]+)|\3|p")
         echo "Current version $CURRENT_MAJOR.$CURRENT_MINOR.$CURRENT_PATCH"
+        
+        [[ $CURRENT_PATCH == "0" ]] || (echo "::error::Patch number was expected to be 0" && exit 1)
 
         NEXT_MAJOR=$CURRENT_MAJOR
         NEXT_MINOR=$(echo $CURRENT_MINOR | awk '{$NF += 1 ; print}')
         NEXT_PATCH="0"
         NEXT_VERSION="$NEXT_MAJOR.$NEXT_MINOR.$NEXT_PATCH"
-        echo "Next version $NEXT_MAJOR.$NEXT_MINOR.$NEXT_PATCH"
-        
+        echo "Next version $NEXT_VERSION"
+        echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_OUTPUT
+
         RELEASE_BRANCH="release/$CURRENT_MAJOR.$CURRENT_MINOR"
+        echo "RELEASE_BRANCH=$RELEASE_BRANCH" >> $GITHUB_OUTPUT
+
+    - name: Set git user info
+      run: |
+        git config user.name "Workflow"
+        git config user.email "<>"
+
+    - name: Create release branch
+      env:
+        RELEASE_BRANCH: ${{ steps.version.outputs.RELEASE_BRANCH }}
+      run: |
         echo "Create release branch $RELEASE_BRANCH"
         git switch -c $RELEASE_BRANCH
         echo "Push release branch to origin"
         git push --set-upstream origin $RELEASE_BRANCH
-        echo "Switch back to main branch"
-        git switch main
-        echo "Update version in main to $NEXT_VERSION"
+        echo "Switch back to current branch"
+        git switch $GITHUB_REF
+
+    - name: Update version
+      env:
+        NEXT_VERSION: ${{ steps.version.outputs.NEXT_VERSION }}
+      run: |
+        echo "Update version in current branch to $NEXT_VERSION"
         sed -i -znE -e "s|(.*<VersionPrefix>[[:space:]]*)([0-9]+\.[0-9]+\.[0-9]+)([[:space:]]*</VersionPrefix>.*)|\1$NEXT_VERSION\3|p" src/WebApplication1/WebApplication1.csproj
         echo "Commit updated version"
         git commit -a -m "Update version to $NEXT_VERSION"
         echo "Push updated version"
         git push
-
-
