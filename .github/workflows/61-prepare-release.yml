@@ -83,6 +83,7 @@ jobs:
 
     - name: GitHub draft release
       env:
+        GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
         RELEASE_VERSION: ${{ steps.version.outputs.RELEASE_VERSION }}
         RELEASE_BRANCH: ${{ steps.version.outputs.RELEASE_BRANCH }}
       run: |

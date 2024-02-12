@@ -43,6 +43,7 @@ jobs:
 
     - name: Publish GitHub release
       env:
+        GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
         RELEASE_VERSION: ${{ steps.version.outputs.RELEASE_VERSION }}
         RELEASE_BRANCH: ${{ steps.release-branch.outputs.RELEASE_BRANCH }}
       run: |
