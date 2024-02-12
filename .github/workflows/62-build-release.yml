@@ -49,12 +49,13 @@ jobs:
     - name: Build webapp
       run: |
         dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp src/WebApplication1
-        zip -r ${{env.DOTNET_ROOT}}/webapp.zip ${{env.DOTNET_ROOT}}/webapp
 
     - name: Upload webapp to release
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
         RELEASE_VERSION: ${{ steps.version.outputs.RELEASE_VERSION }}
       run: |
-        zip 
+        pushd ${{env.DOTNET_ROOT}}/webapp
+        zip -r ../webapp.zip .
+        popd
         gh release upload $RELEASE_VERSION ${{env.DOTNET_ROOT}}/webapp.zip
