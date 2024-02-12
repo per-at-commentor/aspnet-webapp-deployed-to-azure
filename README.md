@@ -8,7 +8,7 @@ Create a repository variable `APP_NAME` with a short simple name of the applicat
 
 # Access to GitHub from GitHub workflows
 
-The workflows need to be able to create and use secrets, variables and environments. Create a personal access token in GitHub with read and write permissions to "Administration", "Environment", "Secrets" and "Variables". Add it as a repository secret with the name `WORKFLOW_GITHUB_TOKEN`.
+The workflows need to be able to create and use secrets, variables and environments. Create a personal access token in GitHub (profile settings -> developer settings) with read and write permissions to "Administration", "Contents", "Environment", "Secrets" and "Variables". Add it as a repository secret with the name `WORKFLOW_GITHUB_TOKEN`.
 
 # Access to Azure from GitHub workflows
 
