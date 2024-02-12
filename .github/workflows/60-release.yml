@@ -6,15 +6,18 @@ on:
 jobs:
   prepare-release:
     uses: ./.github/workflows/61-prepare-release.yml
+    secrets: inherit
 
   build-release:
     needs: prepare-release
     uses: ./.github/workflows/62-build-release.yml
+    secrets: inherit
     with:
       RELEASE_BRANCH: ${{ needs.prepare-release.outputs.RELEASE_BRANCH }}
 
   publish-release:
     needs: [prepare-release, build-release]
     uses: ./.github/workflows/63-publish-release.yml
+    secrets: inherit
     with:
       RELEASE_BRANCH: ${{ needs.prepare-release.outputs.RELEASE_BRANCH }}
