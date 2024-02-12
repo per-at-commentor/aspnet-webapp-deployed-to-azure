@@ -45,6 +45,6 @@ The GitHub workflow `Deploy snapshot` builds and deploys the code to an environm
 
 # Prepare release
 
-The GitHub workflow `Prepare release` creates a new release branch from the `main` branch named after the major and minor parts of the version number (like `release/v1.0`). A draft-release is created in GitHub associated with the new release branch.
+The GitHub workflow `Prepare release` creates a new release branch from the `main` branch named after the major and minor parts of the version number (like `release/v1.2`). A draft-release is created in GitHub associated with the new release branch.
 
 On the `main` branch the minor part of the version number is incremented to indicate it is now used for the next release. If the next release is a new major release, you must update the version number manually afterwards.
