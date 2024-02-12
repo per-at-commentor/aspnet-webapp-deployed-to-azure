@@ -1,0 +1,55 @@
+name: 62 Build release
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      RELEASE_BRANCH:
+        type: string
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Resolve branch
+      id: release-branch
+      env:
+        RELEASE_BRANCH: ${{ inputs.RELEASE_BRANCH }}
+      run: |
+        [[ -z $RELEASE_BRANCH ]] && RELEASE_BRANCH=$GITHUB_REF_NAME
+        echo "RELEASE_BRANCH=$RELEASE_BRANCH" >> $GITHUB_OUTPUT
+        echo "Branch: $RELEASE_BRANCH"
+
+    - name: Checkout
+      uses: actions/checkout@v4.1.1
+      with:
+        ref: ${{ steps.release-branch.outputs.RELEASE_BRANCH }}
+
+    - name: Get version
+      id: version
+      run: |
+        RELEASE_VERSION=$(sed -znE -e "s|.*<VersionPrefix>[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+)[[:space:]]*</VersionPrefix>.*|\1|p" src/WebApplication1/WebApplication1.csproj)
+        [[ -z $RELEASE_VERSION ]] && (echo "::error::Version not found" && exit 1)
+
+        echo "Current version $RELEASE_VERSION"
+        echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+
+        RELEASE_MAJOR=$(echo $RELEASE_VERSION | sed -nE "s|([0-9]+)\.([0-9]+)\.([0-9]+)|\1|p")
+        RELEASE_MINOR=$(echo $RELEASE_VERSION | sed -nE "s|([0-9]+)\.([0-9]+)\.([0-9]+)|\2|p")
+        RELEASE_PATCH=$(echo $RELEASE_VERSION | sed -nE "s|([0-9]+)\.([0-9]+)\.([0-9]+)|\3|p")
+        echo "RELEASE_MAJOR=$RELEASE_MAJOR" >> $GITHUB_OUTPUT
+        echo "RELEASE_MINOR=$RELEASE_MINOR" >> $GITHUB_OUTPUT
+        echo "RELEASE_PATCH=$RELEASE_PATCH" >> $GITHUB_OUTPUT
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4.0.0
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Build webapp
+      run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp src/WebApplication1
+
+    - name: Upload webapp to release
+      env:
+        RELEASE_VERSION: ${{ steps.version.outputs.RELEASE_VERSION }}
+      run: gh release upload $RELEASE_VERSION ${{env.DOTNET_ROOT}}/webapp
