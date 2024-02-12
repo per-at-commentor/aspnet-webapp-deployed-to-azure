@@ -87,4 +87,4 @@ jobs:
         RELEASE_VERSION: ${{ steps.version.outputs.RELEASE_VERSION }}
         RELEASE_BRANCH: ${{ steps.release-branch.outputs.RELEASE_BRANCH }}
       run: |
-        gh release create $RELEASE_VERSION --target $RELEASE_BRANCH --draft
+        gh release create $RELEASE_VERSION --title $RELEASE_VERSION --target $RELEASE_BRANCH --draft
