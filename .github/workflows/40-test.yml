@@ -1,4 +1,4 @@
-name: 40 Build and Test
+name: 40 Test
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
   push:
     branches:
       - main
-      - release/**
+      - release/*
     paths:
       - src/**
   workflow_dispatch:

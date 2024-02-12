@@ -1,4 +1,4 @@
-name: 50 Build and Deploy
+name: 50 Deploy snapshot
 
 on:
   workflow_dispatch:

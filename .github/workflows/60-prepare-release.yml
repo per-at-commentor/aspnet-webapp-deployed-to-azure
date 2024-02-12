@@ -1,4 +1,4 @@
-name: 60 Create release branch
+name: 60 Prepare release
 
 on:
   workflow_dispatch:
@@ -34,7 +34,7 @@ jobs:
         echo "Next version $NEXT_VERSION"
         echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_OUTPUT
 
-        RELEASE_BRANCH="release/$CURRENT_MAJOR.$CURRENT_MINOR"
+        RELEASE_BRANCH="release/v$CURRENT_MAJOR.$CURRENT_MINOR"
         echo "RELEASE_BRANCH=$RELEASE_BRANCH" >> $GITHUB_OUTPUT
 
     - name: Set git user info

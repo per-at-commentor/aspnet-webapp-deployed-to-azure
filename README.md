@@ -37,8 +37,14 @@ The GitHub workflow `Delete environment` deletes the Azure resource group for th
 
 # Test
 
-The GitHub workflow `Build and Test` builds the code and runs automated tests. It is automatically run on pull-requests and when code is committed to the `main` branch.
+The GitHub workflow `Test` builds the code and runs automated tests. It is automatically run on pull-requests and when code is committed to the `main` and `release/*` branches.
 
-# Deploy
+# Deploy snapshot
 
-The GitHub workflow `Build and Deploy` builds and deploys the code to an environment. It is executed manually with the environment as input.
+The GitHub workflow `Deploy snapshot` builds and deploys the code to an environment. It is executed manually with the environment as input.
+
+# Prepare release
+
+The GitHub workflow `Prepare release` creates a new release branch from the `main` branch named after the major and minor parts of the version number (like `release/v1.0`). A draft-release is created in GitHub associated with the new release branch.
+
+On the `main` branch the minor part of the version number is incremented to indicate it is now used for the next release. If the next release is a new major release, you must update the version number manually afterwards.
