@@ -3,8 +3,8 @@ inputs:
   app_version:
     description: The new version number
     required: true
-using: 'composite'
 runs:
+  using: 'composite'
   steps:
   - name: Set app version
     shell: bash
