@@ -5,9 +5,9 @@ outputs:
   current_major_segment:
     value: ${{ steps.app_version.outputs.current_major_segment }}
   current_minor_segment:
-    value: ${{ steps.app_version.outputs.current_major_segment }}
+    value: ${{ steps.app_version.outputs.current_minor_segment }}
   current_patch_segment:
-    value: ${{ steps.app_version.outputs.current_major_segment }}
+    value: ${{ steps.app_version.outputs.current_patch_segment }}
   next_major_app_version:
     value: ${{ steps.app_version.outputs.next_major_app_version }}
   next_minor_app_version:
