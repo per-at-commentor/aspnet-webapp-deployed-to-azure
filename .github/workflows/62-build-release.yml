@@ -42,7 +42,7 @@ jobs:
     - name: Upload webapp to release
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
-        RELEASE_TAG: ${{ steps.app_version.outputs.current-app-version }}
+        RELEASE_TAG: ${{ steps.app_version.outputs.current_app_version }}
         OUTPUT_DIR: ${{ env.DOTNET_ROOT }}
       run: |
         pushd $OUTPUT_DIR/webapp
