@@ -43,4 +43,4 @@ jobs:
     - name: Bump patch version
       uses: ./.github/actions/set-app-version
       with:
-        version: ${{ steps.app_version.outputs.next_patch_app_version }}
+        app_version: ${{ steps.app_version.outputs.next_patch_app_version }}

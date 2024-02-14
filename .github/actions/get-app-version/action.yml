@@ -24,21 +24,31 @@ runs:
       current_app_version=$(sed -znE -e "s|.*<VersionPrefix>[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+)[[:space:]]*</VersionPrefix>.*|\1|p" src/WebApplication1/WebApplication1.csproj)
       [[ -z $current_app_version ]] && (echo "::error::Version not found" && exit 1)
 
-      echo "Current version: $current_app_version"
+      echo "current_app_version=$current_app_version"
       echo "current_app_version=$current_app_version" >> $GITHUB_OUTPUT
 
       current_major_segment=$(echo $current_app_version | sed -nE "s|([0-9]+)\.([0-9]+)\.([0-9]+)|\1|p")
       current_minor_segment=$(echo $current_app_version | sed -nE "s|([0-9]+)\.([0-9]+)\.([0-9]+)|\2|p")
       current_patch_segment=$(echo $current_app_version | sed -nE "s|([0-9]+)\.([0-9]+)\.([0-9]+)|\3|p")
 
+      echo "current_major_segment=$current_major_segment"
       echo "current_major_segment=$current_major_segment" >> $GITHUB_OUTPUT
+      
+      echo "current_minor_segment=$current_minor_segment"
       echo "current_minor_segment=$current_minor_segment" >> $GITHUB_OUTPUT
+      
+      echo "current_patch_segment=$current_patch_segment"
       echo "current_patch_segment=$current_patch_segment" >> $GITHUB_OUTPUT
 
       next_major_segment=$(echo $current_major_segment | awk '{$NF += 1 ; print}')
       next_minor_segment=$(echo $current_minor_segment | awk '{$NF += 1 ; print}')
       next_patch_segment=$(echo $current_patch_segment | awk '{$NF += 1 ; print}')
 
+      echo "next_major_app_version=$next_major_segment.0.0"
       echo "next_major_app_version=$next_major_segment.0.0" >> $GITHUB_OUTPUT
+
+      echo "next_minor_app_version=$current_major_segment.$next_minor_segment.0"
       echo "next_minor_app_version=$current_major_segment.$next_minor_segment.0" >> $GITHUB_OUTPUT
+      
+      echo "next_patch_app_version=$current_major_segment.$current_minor_segment.$next_patch_segment"
       echo "next_patch_app_version=$current_major_segment.$current_minor_segment.$next_patch_segment" >> $GITHUB_OUTPUT
