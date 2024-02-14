@@ -1,9 +1,10 @@
 name: Set app version
 inputs:
-  app-version:
+  app_version:
 runs:
   steps:
   - name: Set app version
+    shell: bash
     env:
       APP_VERSION: ${{ inputs.app_version }}
     run: |

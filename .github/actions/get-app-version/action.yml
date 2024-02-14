@@ -8,17 +8,18 @@ outputs:
     value: ${{ steps.app_version.outputs.current_major_segment }}
   current_patch_segment:
     value: ${{ steps.app_version.outputs.current_major_segment }}
-  next-major_app_version:
-    value: ${{ steps.app_version.outputs.next-major_app_version }}
-  next-minor_app_version:
-    value: ${{ steps.app_version.outputs.next-minor_app_version }}
-  next-patch_app_version:
-    value: ${{ steps.app_version.outputs.next-patch_app_version }}
+  next_major_app_version:
+    value: ${{ steps.app_version.outputs.next_major_app_version }}
+  next_minor_app_version:
+    value: ${{ steps.app_version.outputs.next_minor_app_version }}
+  next_patch_app_version:
+    value: ${{ steps.app_version.outputs.next_patch_app_version }}
 runs:
   using: 'composite'
   steps:
   - name: Get app version
     id: app_version
+    shell: bash
     run: |
       current_app_version=$(sed -znE -e "s|.*<VersionPrefix>[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+)[[:space:]]*</VersionPrefix>.*|\1|p" src/WebApplication1/WebApplication1.csproj)
       [[ -z $current_app_version ]] && (echo "::error::Version not found" && exit 1)
@@ -34,10 +35,10 @@ runs:
       echo "current_minor_segment=$current_minor_segment" >> $GITHUB_OUTPUT
       echo "current_patch_segment=$current_patch_segment" >> $GITHUB_OUTPUT
 
-      next-major_segment=$(echo $current_major_segment | awk '{$NF += 1 ; print}')
-      next-minor_segment=$(echo $current_minor_segment | awk '{$NF += 1 ; print}')
-      next-patch_segment=$(echo $current_patch_segment | awk '{$NF += 1 ; print}')
+      next_major_segment=$(echo $current_major_segment | awk '{$NF += 1 ; print}')
+      next_minor_segment=$(echo $current_minor_segment | awk '{$NF += 1 ; print}')
+      next_patch_segment=$(echo $current_patch_segment | awk '{$NF += 1 ; print}')
 
-      echo "next-major_app_version=$next-major_segment.0.0" >> $GITHUB_OUTPUT
-      echo "next-minor_app_version=$current_major_segment.$next-minor_segment.0" >> $GITHUB_OUTPUT
-      echo "next-patch_app_version=$current_major_segment.$current_minor_segment.$next-patch_segment" >> $GITHUB_OUTPUT
+      echo "next_major_app_version=$next_major_segment.0.0" >> $GITHUB_OUTPUT
+      echo "next_minor_app_version=$current_major_segment.$next_minor_segment.0" >> $GITHUB_OUTPUT
+      echo "next_patch_app_version=$current_major_segment.$current_minor_segment.$next_patch_segment" >> $GITHUB_OUTPUT
