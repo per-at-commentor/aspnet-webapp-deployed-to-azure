@@ -4,20 +4,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  prepare-release:
+  prepare_release:
     uses: ./.github/workflows/61-prepare-release.yml
     secrets: inherit
 
-  build-release:
-    needs: prepare-release
+  build_release:
+    needs: prepare_release
     uses: ./.github/workflows/62-build-release.yml
     secrets: inherit
     with:
-      RELEASE_BRANCH: ${{ needs.prepare-release.outputs.RELEASE_BRANCH }}
+      release_branch: ${{ needs.prepare_release.outputs.release_branch }}
 
-  publish-release:
-    needs: [prepare-release, build-release]
+  publish_release:
+    needs: [prepare_release, build_release]
     uses: ./.github/workflows/63-publish-release.yml
     secrets: inherit
     with:
-      RELEASE_BRANCH: ${{ needs.prepare-release.outputs.RELEASE_BRANCH }}
+      release_branch: ${{ needs.prepare_release.outputs.release_branch }}
