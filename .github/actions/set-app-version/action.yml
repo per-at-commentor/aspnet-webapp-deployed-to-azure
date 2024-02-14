@@ -1,8 +1,7 @@
 name: Set app version
 inputs:
   app_version:
-    description: New app version
-    required: true
+using: 'composite'
 runs:
   steps:
   - name: Set app version
