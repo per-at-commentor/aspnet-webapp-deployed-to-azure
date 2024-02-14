@@ -32,7 +32,16 @@ jobs:
           AZURE_WEBAPP_PUBLISH_PROFILE=$(echo "$AZURE_WEBAPP_PUBLISH_PROFILE_BASE64" | base64 --decode)
           echo "AZURE_WEBAPP_PUBLISH_PROFILE=$AZURE_WEBAPP_PUBLISH_PROFILE" >> $GITHUB_OUTPUT
 
-      - uses: ./.github/actions/azure-login
+      - name: Azure Login
+        uses: azure/login@v1.6.1
+        with:
+          creds: |
+            {
+              "clientId": "${{ vars.WORKFLOW_AZURE_CLIENT_ID }}",
+              "clientSecret": "${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}",
+              "subscriptionId": "${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}",
+              "tenantId": "${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
+            }
 
       - name: Deploy webapp
         id: deploy-webapp
