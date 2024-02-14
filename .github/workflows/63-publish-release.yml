@@ -11,6 +11,8 @@ jobs:
   publish_release:
     runs-on: ubuntu-latest
     steps:
+    - uses: ./.github/actions/assert-main-or-release-branch
+    
     - name: Resolve branch
       id: release_branch
       env:

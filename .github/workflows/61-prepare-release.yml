@@ -16,6 +16,8 @@ jobs:
       release_tag: ${{ steps.app_version.outputs.current_app_version }}
       release_branch: ${{ steps.release_branch.outputs.release_branch }}
     steps:
+    - uses: ./.github/actions/assert-main-or-release-branch
+    
     - name: Checkout
       uses: actions/checkout@v4.1.1
 
