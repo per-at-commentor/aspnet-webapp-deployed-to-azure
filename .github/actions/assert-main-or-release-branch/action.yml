@@ -1,8 +1,0 @@
-name: Assert main or release branch
-runs:
-  using: 'composite'
-  steps:
-  - name: Set app version
-    shell: bash
-    run: |
-      [[ "$GITHUB_REF_NAME" =~ ^(main)|(release/[0-9]+\.[0-9]+)$ ]] || (echo "::error::Workflow should only be run on main and release branches." && exit 1)

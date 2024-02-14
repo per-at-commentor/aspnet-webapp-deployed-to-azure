@@ -16,8 +16,10 @@ jobs:
       release_tag: ${{ steps.app_version.outputs.current_app_version }}
       release_branch: ${{ steps.release_branch.outputs.release_branch }}
     steps:
-    - uses: ./.github/actions/assert-main-or-release-branch
-    
+    - run: |
+        [[ "$GITHUB_REF_NAME" =~ ^(main)|(release/[0-9]+\.[0-9]+)$ ]] \
+        || (echo "::error::Workflow should only be run on main and release branches." && exit 1)
+
     - name: Checkout
       uses: actions/checkout@v4.1.1
 
