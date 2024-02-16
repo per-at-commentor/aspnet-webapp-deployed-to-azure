@@ -13,11 +13,11 @@ jobs:
     uses: ./.github/workflows/62-build-release.yml
     secrets: inherit
     with:
-      release_branch: ${{ needs.prepare_release.outputs.release_branch }}
+      RELEASE_BRANCH: ${{ needs.prepare_release.outputs.RELEASE_BRANCH }}
 
   publish_release:
     needs: [prepare_release, build_release]
     uses: ./.github/workflows/63-publish-release.yml
     secrets: inherit
     with:
-      release_branch: ${{ needs.prepare_release.outputs.release_branch }}
+      RELEASE_BRANCH: ${{ needs.prepare_release.outputs.RELEASE_BRANCH }}

@@ -1,6 +1,6 @@
 name: Set app version
 inputs:
-  app_version:
+  APP_VERSION:
     description: The new version number
     required: true
 runs:
@@ -9,7 +9,7 @@ runs:
   - name: Set app version
     shell: bash
     env:
-      APP_VERSION: ${{ inputs.app_version }}
+      APP_VERSION: ${{ inputs.APP_VERSION }}
     run: |
       echo "New app version: $APP_VERSION"
       sed -i -znE -e "s|(.*<VersionPrefix>[[:space:]]*)([0-9]+\.[0-9]+\.[0-9]+)([[:space:]]*</VersionPrefix>.*)|\1$APP_VERSION\3|p" src/WebApplication1/WebApplication1.csproj

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   workflow_call:
     inputs:
-      release_branch:
+      RELEASE_BRANCH:
         type: string
 
 jobs:
@@ -18,16 +18,16 @@ jobs:
     - name: Resolve branch
       id: release_branch
       env:
-        RELEASE_BRANCH: ${{ inputs.release_branch }}
+        RELEASE_BRANCH: ${{ inputs.RELEASE_BRANCH }}
       run: |
         [[ -z $RELEASE_BRANCH ]] && RELEASE_BRANCH=$GITHUB_REF_NAME
-        echo "release_branch=$RELEASE_BRANCH" >> $GITHUB_OUTPUT
+        echo "RELEASE_BRANCH=$RELEASE_BRANCH" >> $GITHUB_OUTPUT
         echo "Branch: $RELEASE_BRANCH"
 
     - name: Checkout
       uses: actions/checkout@v4.1.1
       with:
-        ref: ${{ steps.release_branch.outputs.release_branch }}
+        ref: ${{ steps.release_branch.outputs.RELEASE_BRANCH }}
 
     - name: Get app version
       id: app_version
@@ -46,7 +46,7 @@ jobs:
     - name: Upload webapp to release
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
-        RELEASE_TAG: ${{ steps.app_version.outputs.current_app_version }}
+        RELEASE_TAG: ${{ steps.app_version.outputs.CURRENT_APP_VERSION }}
         OUTPUT_DIR: ${{ env.DOTNET_ROOT }}
       run: |
         pushd $OUTPUT_DIR/webapp

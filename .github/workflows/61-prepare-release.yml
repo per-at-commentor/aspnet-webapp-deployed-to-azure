@@ -4,17 +4,17 @@ on:
   workflow_dispatch:
   workflow_call:
     outputs:
-      release_tag:
-        value: ${{ jobs.prepare_release.outputs.release_tag }}
-      release_branch:
-        value: ${{ jobs.prepare_release.outputs.release_branch }}
+      RELEASE_TAG:
+        value: ${{ jobs.prepare_release.outputs.RELEASE_TAG }}
+      RELEASE_BRANCH:
+        value: ${{ jobs.prepare_release.outputs.RELEASE_BRANCH }}
 
 jobs:
   prepare_release:
     runs-on: ubuntu-latest
     outputs:
-      release_tag: ${{ steps.app_version.outputs.current_app_version }}
-      release_branch: ${{ steps.release_branch.outputs.release_branch }}
+      RELEASE_TAG: ${{ steps.app_version.outputs.CURRENT_APP_VERSION }}
+      RELEASE_BRANCH: ${{ steps.release_branch.outputs.RELEASE_BRANCH }}
     steps:
     - run: |
         [[ "$GITHUB_REF_NAME" =~ ^(main)|(release/[0-9]+\.[0-9]+)$ ]] \
@@ -30,12 +30,12 @@ jobs:
     - name: Resolve branch
       id: release_branch
       env:
-        MAJOR_SEGMENT: ${{ steps.app_version.outputs.current_major_segment }}
-        MINOR_SEGMENT: ${{ steps.app_version.outputs.current_minor_segment }}
+        MAJOR_SEGMENT: ${{ steps.app_version.outputs.CURRENT_MAJOR_SEGMENT }}
+        MINOR_SEGMENT: ${{ steps.app_version.outputs.CURRENT_MINOR_SEGMENT }}
       run: |
-        release_branch="release/$MAJOR_SEGMENT.$MINOR_SEGMENT"
-        echo "Branch: $release_branch"
-        echo "release_branch=$release_branch" >> $GITHUB_OUTPUT
+        RELEASE_BRANCH="release/$MAJOR_SEGMENT.$MINOR_SEGMENT"
+        echo "Branch: $RELEASE_BRANCH"
+        echo "RELEASE_BRANCH=$RELEASE_BRANCH" >> $GITHUB_OUTPUT
 
     - name: Set Git user info
       if: ${{ github.ref_name == 'main' }}
@@ -46,7 +46,7 @@ jobs:
     - name: Create release branch
       if: ${{ github.ref_name == 'main' }}
       env:
-        RELEASE_BRANCH: ${{ steps.release_branch.outputs.release_branch }}
+        RELEASE_BRANCH: ${{ steps.release_branch.outputs.RELEASE_BRANCH }}
       run: |
         echo "Create release branch $RELEASE_BRANCH"
         git switch -c $RELEASE_BRANCH
@@ -59,12 +59,12 @@ jobs:
       if: ${{ github.ref_name == 'main' }}
       uses: ./.github/actions/set-app-version
       with:
-        app_version: ${{ steps.app_version.outputs.next_minor_app_version }}
+        APP_VERSION: ${{ steps.app_version.outputs.NEXT_MINOR_APP_VERSION }}
 
     - name: GitHub draft release
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
-        RELEASE_TAG: ${{ steps.app_version.outputs.current_app_version }}
-        RELEASE_BRANCH: ${{ steps.release_branch.outputs.release_branch }}
+        RELEASE_TAG: ${{ steps.app_version.outputs.CURRENT_APP_VERSION }}
+        RELEASE_BRANCH: ${{ steps.release_branch.outputs.RELEASE_BRANCH }}
       run: |
         gh release create $RELEASE_TAG --title $RELEASE_TAG --target $RELEASE_BRANCH --draft
