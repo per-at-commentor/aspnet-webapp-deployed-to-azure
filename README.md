@@ -34,6 +34,7 @@ Note that this does not deploy the application.
 The file `terraform.tf` describes the Azure resources needed in an environment to run the application.
 
 If this is changed you can run the workflow `Update environment` on existing environments to update them.
+To review the plannend changes before applying then, configure the environment in GitHub to require approval. This will block the workflow after the Terraform planning-phase allowing you to inspect the plan before applying it. 
 
 ## Delete environment
 
@@ -45,7 +46,7 @@ The workflow `Test` builds the code and runs automated tests. It is automaticall
 
 ## Deploy snapshot
 
-The workflow `Deploy snapshot` builds and deploys the code to an environment. It is executed manually with the environment as input.
+The workflow `Deploy snapshot` builds and deploys the code to an environment. It is executed manually with the environment as input. If the environment is configured in GitHub to require approval the workflow will not run until approval is given.
 
 ## Release
 
