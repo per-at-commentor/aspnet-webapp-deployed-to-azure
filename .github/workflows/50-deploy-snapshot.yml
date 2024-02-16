@@ -25,7 +25,7 @@ jobs:
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp -p:VersionSuffix=snapshot src/WebApplication1
 
       - name: Decode publish profile
-        id: publish-profile
+        id: publish_profile
         env:
           AZURE_WEBAPP_PUBLISH_PROFILE_BASE64: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_BASE64 }}
         run: |
@@ -44,9 +44,8 @@ jobs:
             }
 
       - name: Deploy webapp
-        id: deploy-webapp
         uses: azure/webapps-deploy@v3.0.0
         with:
           app-name: ${{ vars.WEBAPP_NAME }}
-          publish-profile: ${{ steps.publish-profile.outputs.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          publish-profile: ${{ steps.publish_profile.outputs.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: ${{env.DOTNET_ROOT}}/webapp

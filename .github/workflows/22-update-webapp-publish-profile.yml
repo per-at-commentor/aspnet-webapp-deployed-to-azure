@@ -15,7 +15,7 @@ on:
         required: true
 
 jobs:
-  webapp-publish-profile:
+  webapp_publish_profile:
     runs-on: ubuntu-latest
     environment: ${{ inputs.ENV_NAME }}
     steps:
@@ -31,7 +31,7 @@ jobs:
             }
 
       - name: Get webapp publish profile from Azure
-        id: publish-profile
+        id: publish_profile
         uses: azure/CLI@v1.0.9
         with:
           azcliversion: 2.56.0
@@ -46,6 +46,6 @@ jobs:
           GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           ENV_NAME: ${{ inputs.ENV_NAME }}
-          WEBAPP_PUBLISH_PROFILE_BASE64: ${{ steps.publish-profile.outputs.WEBAPP_PUBLISH_PROFILE_BASE64 }}
+          WEBAPP_PUBLISH_PROFILE_BASE64: ${{ steps.publish_profile.outputs.WEBAPP_PUBLISH_PROFILE_BASE64 }}
         run: |
           gh secret set WEBAPP_PUBLISH_PROFILE_BASE64 -R $REPO -e $ENV_NAME -b "$WEBAPP_PUBLISH_PROFILE_BASE64"

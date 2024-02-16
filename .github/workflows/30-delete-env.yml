@@ -52,7 +52,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Delete GitHub Environment
-      id: github
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
         ENV_NAME: ${{ inputs.ENV_NAME }}

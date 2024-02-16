@@ -9,7 +9,7 @@ env:
   STORAGE_CONTAINER: ${{ vars.APP_NAME }}-tfstate
 
 jobs:
-  create-terraform-storage:
+  create_terraform_storage:
     runs-on: ubuntu-latest
     steps:
       - name: Save Terraform information for other workflows to use

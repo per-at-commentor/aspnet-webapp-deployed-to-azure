@@ -33,7 +33,7 @@ jobs:
       ENV_NAME: ${{ inputs.ENV_NAME }}
     secrets: inherit
 
-  update-webapp-publish-profile:
+  update_webapp_publish_profile:
     needs: azure
     uses: ./.github/workflows/22-update-webapp-publish-profile.yml
     with:
