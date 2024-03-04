@@ -83,10 +83,9 @@ jobs:
         uses: dorny/test-reporter@v1.8.0
         if: success() || failure()
         with:
-          name: .NET test results
+          name: Test report
           path: src/TestProject1/TestResults/test-results.trx
           reporter: dotnet-trx
-          fail-on-error: false
 
       - name: Prepare test coverage results
         if: success() || failure()
