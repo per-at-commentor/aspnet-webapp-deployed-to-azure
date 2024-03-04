@@ -68,7 +68,7 @@ jobs:
             /o:"per-at-commentor" \
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.cs.opencover.reportsPaths="src/TestProject1/TestResults/coverage.opencover.xml"
+            /d:sonar.cs.opencover.reportsPaths="src/TestProject1/TestResults/coverage.opencover.xml,src/TestProject2/TestResults/coverage.opencover.xml"
 
       - name: dotnet restore
         run: dotnet restore src
@@ -84,12 +84,14 @@ jobs:
         if: success() || failure()
         with:
           name: Test report
-          path: src/TestProject1/TestResults/test-results.trx
+          path: src/TestProject1/TestResults/test-results.trx,src/TestProject2/TestResults/test-results.trx
           reporter: dotnet-trx
 
       - name: Prepare test coverage results
         if: success() || failure()
-        run: cp src/TestProject1/TestResults/*/coverage.opencover.xml src/TestProject1/TestResults/coverage.opencover.xml
+        run: |
+          cp src/TestProject1/TestResults/*/coverage.opencover.xml src/TestProject1/TestResults/coverage.opencover.xml
+          cp src/TestProject2/TestResults/*/coverage.opencover.xml src/TestProject2/TestResults/coverage.opencover.xml
 
       - name: dotnet sonarscanner end
         if: success() || failure()
