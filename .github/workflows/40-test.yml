@@ -85,7 +85,8 @@ jobs:
           ./.dotnet-tools/reportgenerator -reports:**/coverage.opencover.xml -targetdir:coverage-reports -reporttypes:TextSummary
           cat coverage-reports/Summary.txt
 
-      - name: Add test report in checks-output
+      - name: Publish test report to GitHub
+        # This makes the test results show up in the list of jobs executed on the workflow... notice there is an issue, so it might be shown on the wrong workflow.
         uses: dorny/test-reporter@v1.8.0
         if: success() || failure()
         with:

@@ -38,4 +38,15 @@ public class HomeControllerTest
         var body = await result.Content.ReadAsStringAsync();
         Assert.Contains("An error occurred while processing your request.", body);
     }
+
+    [Fact]
+    public async Task InternalServerError()
+    {
+        var factory = new WebApplicationFactory<HomeController>();
+        var client = factory.CreateDefaultClient();
+        var result = await client.GetAsync("/Home/DivideByZero");
+        Assert.Equal(HttpStatusCode.InternalServerError, result.StatusCode);
+        var body = await result.Content.ReadAsStringAsync();
+        Assert.Contains("DivideByZeroException", body);
+    }
 }
