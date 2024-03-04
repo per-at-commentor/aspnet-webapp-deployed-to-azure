@@ -79,13 +79,32 @@ jobs:
         run: |
           dotnet tool update dotnet-sonarscanner --version 6.2.0 --tool-path ./.sonar/scanner
 
-      - name: Build and analyze
+      - name: dotnet sonarscanner begin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          ./.sonar/scanner/dotnet-sonarscanner begin /k:"per-at-commentor_aspnet-webapp-deployed-to-azure" /o:"per-at-commentor" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-          dotnet restore src
-          dotnet build --no-restore src
-          dotnet test --no-build --collect:"XPlat Code Coverage" src
-          ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          ./.sonar/scanner/dotnet-sonarscanner begin \
+            /k:"per-at-commentor_aspnet-webapp-deployed-to-azure" \
+            /o:"per-at-commentor" \
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.host.url="https://sonarcloud.io" \
+            /d:sonar.cs.opencover.reportsPaths=coverage.xml
+
+      - name: dotnet restore
+        run: dotnet restore src
+
+      - name: dotnet build
+        run: dotnet build --no-restore src
+
+      - name: dotnet test
+        run: dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" src
+
+      - name: move coverage report
+        run: cp src/TestProject1/TestResults/*/coverage.opencover.xml coverage.xml
+
+      - name: dotnet sonarscanner end
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
