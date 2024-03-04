@@ -60,7 +60,7 @@ jobs:
         if: steps.cache-dotnet-tools.outputs.cache-hit != 'true'
         run: |
           dotnet tool update dotnet-sonarscanner --version 6.2.0 --tool-path ./.dotnet-tools
-          dotnet tool update reportgenerator-globaltool --version 5.2.2 --tool-path ./.dotnet-tools
+          dotnet tool update dotnet-reportgenerator-globaltool --version 5.2.2 --tool-path ./.dotnet-tools
 
       - name: dotnet sonarscanner begin
         run: |
