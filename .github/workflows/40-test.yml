@@ -14,23 +14,83 @@ on:
       - src/**
   workflow_dispatch:
 
+permissions:
+  pull-requests: read
+  contents: read
+  actions: read
+  checks: write
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4.1.1
+      # JDK required by Sonar
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'zulu'
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4.0.0
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v4.0.1
+        with:
+          path: ~/sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache sonarscanner
+        id: cache-sonar-scanner
+        uses: actions/cache@v4.0.1
+        with:
+          path: ./.sonar/scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+
+      - name: Install sonarscanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        run: |
+          dotnet tool update dotnet-sonarscanner --version 6.2.0 --tool-path ./.sonar/scanner
+
+      - name: dotnet sonarscanner begin
+        run: |
+          ./.sonar/scanner/dotnet-sonarscanner begin \
+            /k:"per-at-commentor_aspnet-webapp-deployed-to-azure" \
+            /o:"per-at-commentor" \
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.host.url="https://sonarcloud.io" \
+            /d:sonar.cs.opencover.reportsPaths="src/TestProject1/TestResults/coverage.opencover.xml"
+
+      - name: dotnet restore
         run: dotnet restore src
 
-      - name: Build
-        run: dotnet build --no-restore src
+      - name: dotnet build
+        run: dotnet build src --no-restore
 
-      - name: Test
-        run: dotnet test --no-build --verbosity normal src
+      - name: dotnet test
+        run: dotnet test src --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx;LogFileName=test-results.trx"
+
+      - name: Make test report
+        uses: dorny/test-reporter@v1.8.0
+        if: success() || failure()
+        with:
+          name: Test report
+          path: src/TestProject1/TestResults/test-results.trx
+          reporter: dotnet-trx
+
+      - name: Prepare test coverage results
+        if: success() || failure()
+        run: cp src/TestProject1/TestResults/*/coverage.opencover.xml src/TestProject1/TestResults/coverage.opencover.xml
+
+      - name: dotnet sonarscanner end
+        if: success() || failure()
+        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
