@@ -110,7 +110,9 @@ jobs:
           fail-on-error: false
 
       - name: move code coverage results to expected path
+        if: success() || failure()
         run: cp src/TestProject1/TestResults/*/coverage.opencover.xml src/TestProject1/TestResults/coverage.opencover.xml
 
       - name: dotnet sonarscanner end
+        if: success() || failure()
         run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
