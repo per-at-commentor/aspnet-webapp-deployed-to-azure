@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: 17
@@ -98,12 +98,11 @@ jobs:
         run: dotnet build --no-restore src
 
       - name: dotnet test
-        run: dotnet test --no-build \
+        run: dotnet test --no-build src \
           /p:CollectCoverage=true \
           /p:CoverletOutput=../results/coverage \
           /p:MergeWith=../results/coverage.json \
-          /p:CoverletOutputFormat=\"json,opencover\" \
-          src
+          /p:CoverletOutputFormat=\"json,opencover\"
 
       - name: show coverage results
         run: ls results
