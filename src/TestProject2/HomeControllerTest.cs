@@ -7,7 +7,7 @@ namespace TestProject2;
 public class HomeControllerTest
 {
     [Fact]
-    public async Task HomePageShouldContainGreeting()
+    public async Task HomePage()
     {
         var factory = new WebApplicationFactory<HomeController>();
         var client = factory.CreateDefaultClient();
@@ -18,7 +18,7 @@ public class HomeControllerTest
     }
 
     [Fact]
-    public async Task PrivacyPageShouldContainDescription()
+    public async Task PrivacyPage()
     {
         var factory = new WebApplicationFactory<HomeController>();
         var client = factory.CreateDefaultClient();
@@ -26,5 +26,16 @@ public class HomeControllerTest
         Assert.Equal(HttpStatusCode.OK, result.StatusCode);
         var body = await result.Content.ReadAsStringAsync();
         Assert.Contains("Use this page to detail your site's privacy policy.", body);
+    }
+
+    [Fact]
+    public async Task ErrorPage()
+    {
+        var factory = new WebApplicationFactory<HomeController>();
+        var client = factory.CreateDefaultClient();
+        var result = await client.GetAsync("/Home/Error");
+        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        var body = await result.Content.ReadAsStringAsync();
+        Assert.Contains("An error occurred while processing your request.", body);
     }
 }
