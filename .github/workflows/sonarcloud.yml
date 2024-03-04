@@ -89,7 +89,7 @@ jobs:
             /o:"per-at-commentor" \
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.cs.opencover.reportsPaths=coverage.xml
+            /d:sonar.cs.opencover.reportsPaths=./results/coverage.opencover.xml
 
       - name: dotnet restore
         run: dotnet restore src
@@ -98,10 +98,15 @@ jobs:
         run: dotnet build --no-restore src
 
       - name: dotnet test
-        run: dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" src
+        run: dotnet test --no-build /
+          /p:CollectCoverage=true /
+          /p:CoverletOutput=../results/coverage /
+          /p:MergeWith=../results/coverage.json /
+          /p:CoverletOutputFormat=\"opencover,json\" /
+          src
 
-      - name: move coverage report
-        run: cp src/TestProject1/TestResults/*/coverage.opencover.xml coverage.xml
+      - name: show coverage results
+        run: ls results
 
       - name: dotnet sonarscanner end
         env:
