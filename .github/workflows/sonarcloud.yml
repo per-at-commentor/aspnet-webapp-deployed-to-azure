@@ -86,4 +86,5 @@ jobs:
         run: |
           ./.sonar/scanner/dotnet-sonarscanner begin /k:"per-at-commentor_aspnet-webapp-deployed-to-azure" /o:"per-at-commentor" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
           dotnet build src
+          dotnet test src
           ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
