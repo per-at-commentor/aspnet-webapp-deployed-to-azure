@@ -98,7 +98,7 @@ jobs:
         run: dotnet build --no-restore src
 
       - name: dotnet test
-        run: dotnet test --no-build src \
+        run: dotnet test --no-build src/WebApplication1.sln \
           /p:CollectCoverage=true \
           /p:CoverletOutput=../results/coverage \
           /p:MergeWith=../results/coverage.json \
