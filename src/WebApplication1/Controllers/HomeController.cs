@@ -15,6 +15,11 @@ public class HomeController : Controller
         return View();
     }
 
+    public void DivideByZero()
+    {
+        DummyCalculator.Div(1, 0);
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
