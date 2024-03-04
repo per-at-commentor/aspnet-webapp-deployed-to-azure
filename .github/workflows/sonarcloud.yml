@@ -98,11 +98,11 @@ jobs:
         run: dotnet build --no-restore src
 
       - name: dotnet test
-        run: dotnet test --no-build /
-          /p:CollectCoverage=true /
-          /p:CoverletOutput=../results/coverage /
-          /p:MergeWith=../results/coverage.json /
-          /p:CoverletOutputFormat=\"opencover,json\" /
+        run: dotnet test --no-build \
+          /p:CollectCoverage=true \
+          /p:CoverletOutput=../results/coverage \
+          /p:MergeWith=../results/coverage.json \
+          /p:CoverletOutputFormat=\"json,opencover\" \
           src
 
       - name: show coverage results
