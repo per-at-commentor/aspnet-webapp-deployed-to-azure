@@ -80,16 +80,13 @@ jobs:
           dotnet tool update dotnet-sonarscanner --version 6.2.0 --tool-path ./.sonar/scanner
 
       - name: dotnet sonarscanner begin
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           ./.sonar/scanner/dotnet-sonarscanner begin \
             /k:"per-at-commentor_aspnet-webapp-deployed-to-azure" \
             /o:"per-at-commentor" \
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            
+            /d:sonar.cs.opencover.reportsPaths="src/TestProject1/TestResults/coverage.opencover.xml"
 
       - name: dotnet restore
         run: dotnet restore src
@@ -100,11 +97,8 @@ jobs:
       - name: dotnet test
         run: dotnet test src --no-build --collect:"XPlat Code Coverage;Format=opencover"
 
-      - name: copy code coverage results to known path
+      - name: move code coverage results to expected path
         run: cp src/TestProject1/TestResults/*/coverage.opencover.xml src/TestProject1/TestResults/coverage.opencover.xml
 
       - name: dotnet sonarscanner end
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
