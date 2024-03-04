@@ -48,27 +48,28 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Cache sonarscanner
-        id: cache-sonar-scanner
+      - name: Cache dotnet tools
+        id: cache-dotnet-tools
         uses: actions/cache@v4.0.1
         with:
-          path: ./.sonar/scanner
-          key: ${{ runner.os }}-sonar-scanner
-          restore-keys: ${{ runner.os }}-sonar-scanner
+          path: ./.dotnet-tools
+          key: ${{ runner.os }}-dotnet-tools
+          restore-keys: ${{ runner.os }}-dotnet-tools
 
-      - name: Install sonarscanner
-        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+      - name: Install dotnet tools
+        if: steps.cache-dotnet-tools.outputs.cache-hit != 'true'
         run: |
-          dotnet tool update dotnet-sonarscanner --version 6.2.0 --tool-path ./.sonar/scanner
+          dotnet tool update dotnet-sonarscanner --version 6.2.0 --tool-path ./.dotnet-tools
+          dotnet tool update reportgenerator-globaltool --version 5.2.2 --tool-path ./.dotnet-tools
 
       - name: dotnet sonarscanner begin
         run: |
-          ./.sonar/scanner/dotnet-sonarscanner begin \
+          ./.dotnet-tools/dotnet-sonarscanner begin \
             /k:"per-at-commentor_aspnet-webapp-deployed-to-azure" \
             /o:"per-at-commentor" \
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.cs.opencover.reportsPaths="src/TestProject1/TestResults/coverage.opencover.xml,src/TestProject2/TestResults/coverage.opencover.xml"
+            /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
 
       - name: dotnet restore
         run: dotnet restore src
@@ -79,20 +80,19 @@ jobs:
       - name: dotnet test
         run: dotnet test src --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx;LogFileName=test-results.trx"
 
-      - name: Make test report
+      - name: Print coverage report to console
+        run: |
+          ./.dotnet-tools/reportgenerator -reports:**/coverage.opencover.xml -targetdir:coverage-reports -reporttypes:TextSummary
+          cat coverage-reports/Summary.txt
+
+      - name: Add test report in checks-output
         uses: dorny/test-reporter@v1.8.0
         if: success() || failure()
         with:
           name: Test report
-          path: src/TestProject1/TestResults/test-results.trx,src/TestProject2/TestResults/test-results.trx
+          path: "**/test-results.trx"
           reporter: dotnet-trx
-
-      - name: Prepare test coverage results
-        if: success() || failure()
-        run: |
-          cp src/TestProject1/TestResults/*/coverage.opencover.xml src/TestProject1/TestResults/coverage.opencover.xml
-          cp src/TestProject2/TestResults/*/coverage.opencover.xml src/TestProject2/TestResults/coverage.opencover.xml
 
       - name: dotnet sonarscanner end
         if: success() || failure()
-        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+        run: ./.dotnet-tools/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
