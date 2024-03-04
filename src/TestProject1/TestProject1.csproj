@@ -16,4 +16,8 @@
     <PackageReference Include="coverlet.collector" Version="6.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WebApplication1\WebApplication1.csproj" />
+  </ItemGroup>
+
 </Project>
