@@ -15,9 +15,10 @@ public class HomeController : Controller
         return View();
     }
 
-    public void DivideByZero()
+    [HttpGet("Home/Divide/{x}/By/{y}")]
+    public int Divide(int x, int y)
     {
-        DummyCalculator.Div(1, 0);
+        return DummyCalculator.Div(x, y);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
