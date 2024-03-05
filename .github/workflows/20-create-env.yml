@@ -28,10 +28,10 @@ jobs:
       - name: Create GitHub Environment
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_GITHUB_TOKEN }}
-          ENV_NAME: ${{ inputs.ENV_NAME }}
           REPO: ${{ github.repository }}
+          ENV_NAME: ${{ inputs.ENV_NAME }}
+          ENV_TYPE: ${{ inputs.ENV_TYPE }}
         run: |
-          echo "=== CREATE GITHUB ENV [$ENV_NAME] ==="
           gh api --method PUT repos/$REPO/environments/$ENV_NAME
           gh variable set ENV_TYPE -R $REPO -e $ENV_NAME -b "$ENV_TYPE"
 
