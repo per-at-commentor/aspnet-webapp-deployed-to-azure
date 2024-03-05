@@ -42,7 +42,7 @@ The workflow `Delete environment` deletes the Azure resource group for the envir
 
 ## Test
 
-The workflow `Test` builds the code and runs automated tests. It is automatically run on pull-requests and when code is committed to the `main` and `release/*` branches.
+The workflow `Test` builds the code and runs automated tests. It also uses SonarCloud to perform static code analisys and monitor code coverage. The workflow is automatically run on pull-requests and when code is committed to the `main` and `release/*` branches.
 
 ## Deploy snapshot
 
