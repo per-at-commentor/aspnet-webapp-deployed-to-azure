@@ -42,7 +42,7 @@ resource "azurerm_linux_web_app" "webapp" {
   service_plan_id       = azurerm_service_plan.asp.id
   https_only            = true
   site_config {
-    always_on           = ${var.WEBAPP_ALWAYS_ON}
+    always_on           = "${var.WEBAPP_ALWAYS_ON}"
     minimum_tls_version = "1.2"
     application_stack {
       dotnet_version    = "8.0"
