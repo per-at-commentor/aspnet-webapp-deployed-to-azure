@@ -1,5 +1,7 @@
 variable APP_NAME {}
 variable ENV_NAME {}
+variable APP_SERVICE_PLAN_SKU {}
+variable WEBAPP_ALWAYS_ON {}
 
 terraform {
   required_providers {
@@ -29,7 +31,7 @@ resource "azurerm_service_plan" "asp" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   os_type             = "Linux"
-  sku_name            = "B1"
+  sku_name            = "${var.APP_SERVICE_PLAN_SKU}"
 }
 
 # Create Web App
@@ -39,7 +41,8 @@ resource "azurerm_linux_web_app" "webapp" {
   resource_group_name   = azurerm_resource_group.rg.name
   service_plan_id       = azurerm_service_plan.asp.id
   https_only            = true
-  site_config { 
+  site_config {
+    always_on           = "${var.WEBAPP_ALWAYS_ON}"
     minimum_tls_version = "1.2"
     application_stack {
       dotnet_version    = "8.0"

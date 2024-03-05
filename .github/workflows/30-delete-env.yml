@@ -13,39 +13,40 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.ENV_NAME }}
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4.1.1
-
-    - name: Prepare Terraform variables
-      run: |
-        echo 'APP_NAME="${{ vars.APP_NAME }}"' >> terraform.tfvars
-        echo 'ENV_NAME="${{ inputs.ENV_NAME }}"' >> terraform.tfvars
-        cat terraform.tfvars
-
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3.0.0
       with:
         terraform_version: 1.7.0
 
-    - name: Terraform init
+    - name: Checkout repository
+      uses: actions/checkout@v4.1.1
+
+    - name: Delete Azure resources
       run: |
+        cd terraform
         export ARM_SUBSCRIPTION_ID="${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}"
         export ARM_TENANT_ID="${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
         export ARM_CLIENT_ID="${{ vars.WORKFLOW_AZURE_CLIENT_ID }}"
         export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
+
+        echo '::group::Prepare Terraform variables'
+        echo 'APP_NAME = "${{ vars.APP_NAME }}"' >> terraform.tfvars
+        echo 'ENV_NAME = "${{ inputs.ENV_NAME }}"' >> terraform.tfvars
+        cat ${{ vars.ENV_TYPE }}.tfvars >> terraform.tfvars
+        cat terraform.tfvars
+        echo '::endgroup::'
+
+        echo '::group::Terraform init'
         terraform init \
           -backend-config="resource_group_name=${{ vars.TERRAFORM_RESOURCE_GROUP_NAME }}" \
           -backend-config="storage_account_name=${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }}" \
           -backend-config="container_name=${{ vars.TERRAFORM_STORAGE_CONTAINER_NAME }}" \
           -backend-config="key=${{ vars.APP_NAME }}-${{ inputs.ENV_NAME }}.tfstate"
+        echo '::endgroup::'
 
-    - name: Terraform destroy
-      run: |
-        export ARM_SUBSCRIPTION_ID="${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}"
-        export ARM_TENANT_ID="${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
-        export ARM_CLIENT_ID="${{ vars.WORKFLOW_AZURE_CLIENT_ID }}"
-        export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
+        echo '::group::Terraform destroy'
         terraform destroy --auto-approve
+        echo '::endgroup::'
 
   github:
     needs: azure
@@ -57,7 +58,6 @@ jobs:
         ENV_NAME: ${{ inputs.ENV_NAME }}
         REPO: ${{ github.repository }}
       run: |
-        echo "=== DELETE GITHUB ENV [$ENV_NAME] ==="
         gh api --method DELETE repos/$REPO/environments/$ENV_NAME
 
       
