@@ -30,8 +30,8 @@ jobs:
         export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
 
         echo '::group::Prepare Terraform variables'
-        echo 'APP_NAME="${{ vars.APP_NAME }}"' >> terraform.tfvars
-        echo 'ENV_NAME="${{ inputs.ENV_NAME }}"' >> terraform.tfvars
+        echo 'APP_NAME = "${{ vars.APP_NAME }}"' >> terraform.tfvars
+        echo 'ENV_NAME = "${{ inputs.ENV_NAME }}"' >> terraform.tfvars
         cat ${{ vars.ENV_TYPE }}.tfvars >> terraform.tfvars
         cat terraform.tfvars
         echo '::endgroup::'
