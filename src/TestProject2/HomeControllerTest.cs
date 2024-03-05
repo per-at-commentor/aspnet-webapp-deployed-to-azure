@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Hosting;
 using System.Net;
 using WebApplication1.Controllers;
 
@@ -40,13 +42,39 @@ public class HomeControllerTest
     }
 
     [Fact]
-    public async Task InternalServerError()
+    public async Task Divide10By2()
     {
         var factory = new WebApplicationFactory<HomeController>();
         var client = factory.CreateDefaultClient();
-        var result = await client.GetAsync("/Home/DivideByZero");
+        var result = await client.GetAsync("/Home/Divide/10/By/2");
+        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        var body = await result.Content.ReadAsStringAsync();
+        Assert.Contains("5", body);
+    }
+
+    [Fact]
+    public async Task DevelopmentEnvironmentShouldExposeErrorDetailsOnException()
+    {
+        var factory = new WebApplicationFactory<HomeController>().WithWebHostBuilder(b => b.UseEnvironment(Environments.Development));
+        var client = factory.CreateDefaultClient();
+        var result = await client.GetAsync("/Home/Divide/10/By/0");
         Assert.Equal(HttpStatusCode.InternalServerError, result.StatusCode);
         var body = await result.Content.ReadAsStringAsync();
         Assert.Contains("DivideByZeroException", body);
+        Assert.Contains("at WebApplication1.DummyCalculator.Div", body);
     }
+
+    [Fact]
+    public async Task ProductionEnvironmentShouldUseGenericErrorPageOnException()
+    {
+        var factory = new WebApplicationFactory<HomeController>().WithWebHostBuilder(b => b.UseEnvironment(Environments.Production));
+        var client = factory.CreateDefaultClient();
+        var result = await client.GetAsync("/Home/Divide/10/By/0");
+        Assert.Equal(HttpStatusCode.InternalServerError, result.StatusCode);
+        var body = await result.Content.ReadAsStringAsync();
+        Assert.Contains("An error occurred while processing your request.", body);
+        Assert.DoesNotContain("DivideByZeroException", body);
+        Assert.DoesNotContain("at WebApplication1.DummyCalculator.Div", body);
+    }
+
 }
