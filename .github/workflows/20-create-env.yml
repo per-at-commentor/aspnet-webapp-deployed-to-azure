@@ -7,6 +7,14 @@ on:
         description: Environment name
         type: string
         required: true
+      ENV_TYPE:
+        description: Environment type
+        default: Development
+        type: choice
+        options:
+          - Development
+          - Staging
+          - Production
 
 jobs:
   github:
@@ -25,6 +33,7 @@ jobs:
         run: |
           echo "=== CREATE GITHUB ENV [$ENV_NAME] ==="
           gh api --method PUT repos/$REPO/environments/$ENV_NAME
+          gh variable set ENV_TYPE -R $REPO -e $ENV_NAME -b "$ENV_TYPE"
 
   azure:
     needs: github

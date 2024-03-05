@@ -17,91 +17,96 @@ on:
 jobs:
   terraform_plan:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.ENV_NAME }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4.1.1
-
-      - name: Prepare Terraform variables
-        run: |
-          echo 'APP_NAME="${{ vars.APP_NAME }}"' >> terraform.tfvars
-          echo 'ENV_NAME="${{ inputs.ENV_NAME }}"' >> terraform.tfvars
-          cat terraform.tfvars
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.0.0
         with:
           terraform_version: 1.7.0
 
-      - name: Terraform init
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.1
+
+      - name: Prepare changes
         run: |
+          cd terraform
           export ARM_SUBSCRIPTION_ID="${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}"
           export ARM_TENANT_ID="${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
           export ARM_CLIENT_ID="${{ vars.WORKFLOW_AZURE_CLIENT_ID }}"
           export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
+
+          echo '::group::Prepare Terraform variables'
+          echo 'APP_NAME="${{ vars.APP_NAME }}"' >> terraform.tfvars
+          echo 'ENV_NAME="${{ inputs.ENV_NAME }}"' >> terraform.tfvars
+          cat ${{ vars.ENV_TYPE }}.tfvars >> terraform.tfvars
+          cat terraform.tfvars
+          echo '::endgroup::'
+
+          echo '::group::Terraform init'
           terraform init \
             -backend-config="resource_group_name=${{ vars.TERRAFORM_RESOURCE_GROUP_NAME }}" \
             -backend-config="storage_account_name=${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }}" \
             -backend-config="container_name=${{ vars.TERRAFORM_STORAGE_CONTAINER_NAME }}" \
             -backend-config="key=${{ vars.APP_NAME }}-${{ inputs.ENV_NAME }}.tfstate"
+          echo '::endgroup::'
 
-      - name: Terraform validate
-        run: terraform validate
+          echo '::group::Terraform validate'
+          terraform validate
+          echo '::endgroup::'
 
-      - name: Terraform plan
-        run: |
-          export ARM_SUBSCRIPTION_ID="${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}"
-          export ARM_TENANT_ID="${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
-          export ARM_CLIENT_ID="${{ vars.WORKFLOW_AZURE_CLIENT_ID }}"
-          export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
+          echo '::group::Terraform plan'
           terraform plan -out=tfplan
+          echo '::endgroup::'
 
-      - name: Upload Terraform files
+      - name: Upload prepared changes
         uses: actions/upload-artifact@v4.2.0
         with:
           name: tf-files
           path: |
-            terraform.tfvars
-            .terraform.lock.hcl
-            tfplan
+            terraform/terraform.tfvars
+            terraform/.terraform.lock.hcl
+            terraform/tfplan
 
   terraform_apply:
     runs-on: ubuntu-latest
     needs: terraform_plan
     environment: ${{ inputs.ENV_NAME }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4.1.1
-
-      - name: Download Terraform files
-        uses: actions/download-artifact@v4.1.1
-        with:
-          name: tf-files
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.0.0
         with:
           terraform_version: 1.7.0
 
-      - name: Terraform init
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.1
+
+      - name: Download prepared changes
+        uses: actions/download-artifact@v4.1.1
+        with:
+          name: tf-files
+          path: terraform
+
+      - name: Apply prepared changes
+        id: tf_apply
         run: |
+          cd terraform
           export ARM_SUBSCRIPTION_ID="${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}"
           export ARM_TENANT_ID="${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
           export ARM_CLIENT_ID="${{ vars.WORKFLOW_AZURE_CLIENT_ID }}"
           export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
+
+          echo '::group::Terraform init'
           terraform init \
             -backend-config="resource_group_name=${{ vars.TERRAFORM_RESOURCE_GROUP_NAME }}" \
             -backend-config="storage_account_name=${{ vars.TERRAFORM_STORAGE_ACCOUNT_NAME }}" \
             -backend-config="container_name=${{ vars.TERRAFORM_STORAGE_CONTAINER_NAME }}" \
             -backend-config="key=${{ vars.APP_NAME }}-${{ inputs.ENV_NAME }}.tfstate"
+          echo '::endgroup::'
 
-      - name: Terraform apply
-        id: tf_apply
-        run: |
-          export ARM_SUBSCRIPTION_ID="${{ vars.WORKFLOW_AZURE_SUBSCRIPTION_ID }}"
-          export ARM_TENANT_ID="${{ vars.WORKFLOW_AZURE_TENANT_ID }}"
-          export ARM_CLIENT_ID="${{ vars.WORKFLOW_AZURE_CLIENT_ID }}"
-          export ARM_CLIENT_SECRET="${{ secrets.WORKFLOW_AZURE_CLIENT_SECRET }}"
+          echo '::group::Terraform apply'
           terraform apply tfplan
+          echo '::endgroup::'
+
           echo "RESOURCE_GROUP_NAME=$(terraform output -raw resource_group_name)" >> $GITHUB_OUTPUT
           echo "WEBAPP_NAME=$(terraform output -raw webapp_name)" >> $GITHUB_OUTPUT
 
