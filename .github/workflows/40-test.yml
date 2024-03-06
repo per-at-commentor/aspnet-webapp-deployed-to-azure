@@ -1,5 +1,5 @@
 name: 40 Test
-run-name: "${{ github.workflow }}${{ github.event_name == 'pull_request' && format(' - PR #{0}', github.event.pull_request.number)}}"
+run-name: "${{ github.workflow }}${{ github.event_name == 'pull_request' && format(' - PR #{0} {1}', github.event.pull_request.number, github.event.pull_request.title) }}"
 
 on:
   pull_request:
@@ -25,11 +25,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-
       # JDK required by Sonar
       - name: Setup JDK
         uses: actions/setup-java@v4.1.0
