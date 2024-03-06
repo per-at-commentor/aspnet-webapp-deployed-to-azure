@@ -76,5 +76,4 @@ public class HomeControllerTest
         Assert.DoesNotContain("DivideByZeroException", body);
         Assert.DoesNotContain("at WebApplication1.DummyCalculator.Div", body);
     }
-
 }
