@@ -74,4 +74,4 @@ The workflow `Publish release` should only be used on release branches. It chang
 
 ## Deploy release
 
-The forkflow `Deploy release` whould only be used on release-tags. It will download the relase artifacts from the GitHub release matching the given tag and deploy them to the given environment.
+The workflow `Deploy release` whould only be used on release-tags. It will download the relase artifacts from the GitHub release matching the given tag and deploy them to the given environment.

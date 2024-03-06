@@ -41,6 +41,7 @@ jobs:
           echo 'ENV_NAME = "${{ inputs.ENV_NAME }}"' >> terraform.tfvars
           cat ${{ vars.ENV_TIER }}.tfvars >> terraform.tfvars
           cat terraform.tfvars
+          echo ''
           echo '::endgroup::'
 
           echo '::group::Terraform init'
