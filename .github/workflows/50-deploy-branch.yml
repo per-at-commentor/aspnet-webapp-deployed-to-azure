@@ -1,4 +1,4 @@
-name: 50 Deploy snapshot
+name: 50 Deploy branch snapshot
 run-name: "${{ github.workflow }} [${{ inputs.ENV_NAME }}]"
 
 on:

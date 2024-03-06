@@ -46,11 +46,11 @@ The workflow `Delete environment` deletes the Azure resource group for the envir
 
 ## Test
 
-The workflow `Test` builds the code and runs automated tests. It also uses SonarCloud to perform static code analisys and monitor code coverage. The workflow is automatically run on pull-requests and when code is committed to the `main` and `release/*` branches.
+The workflow `Test` builds the code and runs automated tests. It also uses SonarCloud to perform static code analisys and monitor code coverage. The workflow is automatically run on pull-requests and when code is committed to the `main` and `release/*` branches. It can be run manually on a given branch.
 
-## Deploy snapshot
+## Deploy branch snapshot
 
-The workflow `Deploy snapshot` builds and deploys the code to an environment. It is executed manually with the environment as input. If the environment is configured in GitHub to require approval the workflow will not run until approval is given.
+The workflow `Deploy branch snapshot` builds and deploys the code from a branch to an environment. It is executed manually with the environment as input. If the environment is configured in GitHub to require approval the workflow will not run until approval is given.
 
 ## Release
 
@@ -60,9 +60,11 @@ The workflow `Release` calls `Prepare release`, `Build release` and `Publish rel
 
 ## Prepare release
 
-The workflow `Prepare release` creates a draft-release in GitHub. It should be run on the `main` branch or on a previously created release branch.
+The workflow `Prepare release` creates a draft-release in GitHub.
 
 If the workflow is run on the `main` branch it creates a new release branch named after the major and minor parts of the version number (like `release/1.2`). On the `main` branch the minor part of the version number is incremented to indicate it is now used for the next release. If the next release is a new major release, the version number must be updated manually afterwards.
+
+The workflow can also be run on a previously a release branch that have previously been published.
 
 ## Build release
 
