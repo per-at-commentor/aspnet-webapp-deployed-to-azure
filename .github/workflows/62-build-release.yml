@@ -1,4 +1,5 @@
 name: 62 Build release
+run-name: "${{ github.workflow }}"
 
 on:
   workflow_dispatch:

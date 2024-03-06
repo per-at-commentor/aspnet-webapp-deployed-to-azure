@@ -1,4 +1,5 @@
 name: 10 Create Terraform backend storage
+run-name: "${{ github.workflow }}"
 
 on:
   workflow_dispatch:
