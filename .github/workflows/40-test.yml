@@ -1,4 +1,5 @@
 name: 40 Test
+run-name: "${{ github.workflow }} - ${{ github.event.head_commit.message }}"
 
 on:
   pull_request:
@@ -39,7 +40,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.1
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0  # Shallow clones should be disabled for better SonarCloud analysis
 
       - name: Cache SonarCloud packages
         uses: actions/cache@v4.0.1
@@ -48,25 +49,25 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Cache dotnet tools
-        id: cache-dotnet-tools
+      - name: Cache analysis tools
+        id: cache-analysis-tools
         uses: actions/cache@v4.0.1
         with:
-          path: ./.dotnet-tools
-          key: ${{ runner.os }}-dotnet-tools
-          restore-keys: ${{ runner.os }}-dotnet-tools
+          path: ./.analysis-tools
+          key: ${{ runner.os }}-analysis-tools
+          restore-keys: ${{ runner.os }}-analysis-tools
 
       - name: Install dotnet tools
-        if: steps.cache-dotnet-tools.outputs.cache-hit != 'true'
+        if: steps.cache-analysis-tools.outputs.cache-hit != 'true'
         run: |
-          dotnet tool update dotnet-sonarscanner --version 6.2.0 --tool-path ./.dotnet-tools
-          dotnet tool update dotnet-reportgenerator-globaltool --version 5.2.2 --tool-path ./.dotnet-tools
+          dotnet tool update dotnet-sonarscanner --version 6.2.0 --tool-path ./.analysis-tools
+          dotnet tool update dotnet-reportgenerator-globaltool --version 5.2.2 --tool-path ./.analysis-tools
 
       - name: dotnet sonarscanner begin
         run: |
-          ./.dotnet-tools/dotnet-sonarscanner begin \
-            /k:"per-at-commentor_aspnet-webapp-deployed-to-azure" \
-            /o:"per-at-commentor" \
+          ./.analysis-tools/dotnet-sonarscanner begin \
+            /k:"${{ vars.SONAR_PROJECT_KEY }}" \
+            /o:"${{ vars.SONAR_ORGANIZATION_KEY }}" \
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
@@ -80,13 +81,14 @@ jobs:
       - name: dotnet test
         run: dotnet test src --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx;LogFileName=test-results.trx"
 
-      - name: Print coverage report to console
+      - name: Print coverage report
         run: |
-          ./.dotnet-tools/reportgenerator -reports:**/coverage.opencover.xml -targetdir:coverage-reports -reporttypes:TextSummary
+          ./.analysis-tools/reportgenerator -reports:**/coverage.opencover.xml -targetdir:coverage-reports -reporttypes:TextSummary
           cat coverage-reports/Summary.txt
 
-      - name: Publish test report to GitHub
-        # This makes the test results show up in the list of jobs executed on the workflow... notice there is an issue, so it might be shown on the wrong workflow.
+      - name: Publish test report as a check run
+        # This makes the test results available on pull-requsts in GitHub, to make it easier to find failed tests.
+        # Notice there is an issue, so it might be shown under the wrong workflow/check suite.
         uses: dorny/test-reporter@v1.8.0
         if: success() || failure()
         with:
@@ -96,4 +98,4 @@ jobs:
 
       - name: dotnet sonarscanner end
         if: success() || failure()
-        run: ./.dotnet-tools/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+        run: ./.analysis-tools/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"

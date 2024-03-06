@@ -15,6 +15,10 @@ The workflows need to be able to create and use secrets, variables and environme
 The workflows need to be able to manage resources in Azure. Create a service principal in Azure with the "Contributor" role on a subscription. Then create the following repository variables `WORKFLOW_AZURE_TENANT_ID`, `WORKFLOW_AZURE_SUBSCRIPTION_ID`, `WORKFLOW_AZURE_CLIENT_ID` and the repository secret `WORKFLOW_AZURE_CLIENT_SECRET`.
 To create the user manually you need to create an app-registration and then add a client secret to it. Alternativly use the command: `az ad sp create-for-rbac --name <PRINCIPAL_NAME> --role Contributor --scopes /subscriptions/<SUBSCRIPTION_ID> --json-auth`. The command creates both the app-registration and the client secret.
 
+# SonarCloud integration
+
+The workflows use SonarCloud for static code analysis. This requires the GitHub repository to be imported to SonarCloud as a project. This can be done by logging into sonarcloud.io using your GitHub account and then you will be able to import the repository as a project. Once imported you can go to the "Information" page for the project in SonarCloud and get the "Project Key" and "Organization Key". These keys must be add to GitHub as repository variables `SONAR_PROJECT_KEY` and `SONAR_ORGANIZATION_KEY`. You will also need to generate a token in SonarCloud. Go to the "My Account" page and generate a token on the "Security" tab. The generated token must be added to GitHub as a repository variable named `SONAR_TOKEN`.
+
 # Workflows
 
 The workflows can be run from the repository in GitHub.
@@ -67,3 +71,7 @@ The workflow `Build release` should only be used on release branches. It builds 
 ## Publish release
 
 The workflow `Publish release` should only be used on release branches. It changes the corresponding release in GitHub (previously created with `Prepare release`) from draft to published. It also increments the patch version in the release-branch to indicate that futher development on the branch is for the next patch release.
+
+## Deploy release
+
+The forkflow `Deploy release` whould only be used on release-tags. It will download the relase artifacts from the GitHub release matching the given tag and deploy them to the given environment.

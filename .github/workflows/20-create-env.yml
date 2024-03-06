@@ -1,4 +1,5 @@
 name: 20 Create environment
+run-name: "${{ github.workflow }} [${{ inputs.ENV_NAME }}]"
 
 on:
   workflow_dispatch:
