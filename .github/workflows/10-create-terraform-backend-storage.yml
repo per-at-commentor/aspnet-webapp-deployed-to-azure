@@ -23,7 +23,7 @@ jobs:
           gh variable set TERRAFORM_STORAGE_CONTAINER_NAME -R $REPO -b $STORAGE_CONTAINER
 
       - name: Azure Login
-        uses: azure/login@v1.6.1
+        uses: azure/login@v2
         with:
           creds: |
             {
