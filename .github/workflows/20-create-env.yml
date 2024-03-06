@@ -1,5 +1,5 @@
 name: 20 Create environment
-run-name: "${{ github.workflow }} [${{ inputs.ENV_NAME }}]"
+run-name: "${{ github.workflow }} [${{ inputs.ENV_NAME }}] (${{ inputs.ENV_TIER }})"
 
 on:
   workflow_dispatch:
