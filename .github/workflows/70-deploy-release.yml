@@ -1,5 +1,5 @@
 name: 70 Deploy release
-run-name: "${{ github.workflow }} [${{ inputs.ENV_NAME }}] - ${{ github.ref_name }}"
+run-name: "${{ github.workflow }} ${{ github.ref_name }} [${{ inputs.ENV_NAME }}]"
 
 on:
   workflow_dispatch:

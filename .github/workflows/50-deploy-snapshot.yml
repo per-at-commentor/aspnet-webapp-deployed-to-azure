@@ -1,5 +1,5 @@
 name: 50 Deploy snapshot
-run-name: "${{ github.workflow }} [${{ inputs.ENV_NAME }}] - ${{ github.event.head_commit.message }}"
+run-name: "${{ github.workflow }} [${{ inputs.ENV_NAME }}]"
 
 on:
   workflow_dispatch:
