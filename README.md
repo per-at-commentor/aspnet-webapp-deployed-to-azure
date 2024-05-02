@@ -1,6 +1,6 @@
 # aspnet-webapp-deployed-to-azure
 
-Experiment with deploying an asp.net web application to azure
+Experiment with deploying an ASP.NET web application to Azure using GitHub workflows.
 
 # Application name
 
